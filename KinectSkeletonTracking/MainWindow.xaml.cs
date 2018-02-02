@@ -70,6 +70,54 @@ namespace KinectSkeletonTracking
             SendRotate();    // 角度を取得して送信する
         }
 
+        private void DrawBodyFrame()
+        {
+            // ウィンドウサイズ変更を初期化？
+            CanvasBody.Children.Clear();
+
+            foreach (var body in bodies.Where(b => b.IsTracked))
+            {
+                foreach (var joint in body.Joints)
+                {
+                    // 追跡状態
+                    if (joint.Value.TrackingState == TrackingState.Tracked)
+                    {
+                        // 骨格を描画する線の設定
+                        DrawEllipse(joint.Value, 10, Brushes.Blue);
+                    }
+                    // 推測状態
+                    else if(joint.Value.TrackingState==TrackingState.Inferred)
+                    {
+                        DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                    }
+                }
+            }
+        }
+
+        private void DrawEllipse(Joint joint, int R, Brush brush)
+        {
+            var ellipse = new Ellipse()
+            {
+                // X,Y,Z軸（三次元）をX,Y軸（二次元）に変換
+                Width = R,
+                Height = R,
+                Fill = brush,
+            };
+
+            // カメラからDepth座標へ変換
+            var point = kinect.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+            if ((point.X < 0) || (point.Y < 0))
+            {
+                return;
+            }
+
+            // 関節を円で描画
+            CanvasBody.SetLeft(ellipse, point.X - (R / 2));
+            CanvasBody.SetTop(ellipse, point.Y - (R / 2));
+
+            CanvasBody.Children.Add(ellipse);
+        }
+
         // ボディの更新をする。イベントハンドラ（フレームが取得できた、イベントが発生した ときにコールされる）
         private void UpdateBodyFrame(BodyFrameArrivedEventArgs e)
         {

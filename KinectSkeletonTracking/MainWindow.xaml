@@ -9,7 +9,7 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     
-    <!--<Grid >
+    <Grid >
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
         
         <StackPanel Orientation="Vertical">
@@ -17,6 +17,6 @@
             <TextBlock x:Name="TextBodyCount2"/>
             <TextBlock x:Name="TextBodyCount3"/>
         </StackPanel>
-    </Grid>-->
+    </Grid>
     
 </Window>
