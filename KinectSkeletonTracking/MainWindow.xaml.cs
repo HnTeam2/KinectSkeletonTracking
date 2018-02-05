@@ -158,7 +158,11 @@ namespace KinectSkeletonTracking
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
                             var rollRotate = CalcRotate.Roll(orientation);
+
+
+                            //Textで表示させるためにstring型へ変換
                             string str = rollRotate.ToString();
+                            //表示
                             Canvasangle.Text = str;
                             
                         
