@@ -158,6 +158,9 @@ namespace KinectSkeletonTracking
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
                             var rollRotate = CalcRotate.Roll(orientation);
+                            string str = rollRotate.ToString();
+                            Canvasangle.Text = str;
+                            
                         
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
                             Debug.WriteLine(((int)rollRotate).ToString());

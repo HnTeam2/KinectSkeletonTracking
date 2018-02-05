@@ -9,8 +9,9 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     
-    <Grid >
+    <Grid>
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
+        <TextBox x:Name="Canvasangle"  Width="415" Height="20" Margin="93,291,10.4,9.8" />
         
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="TextBodyCount1"/>
