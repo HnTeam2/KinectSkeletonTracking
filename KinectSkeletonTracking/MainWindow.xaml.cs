@@ -127,6 +127,11 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
+            }
+            port.Close();
+            port.Dispose();
+
+        }
         private void SendRotate()
         {
             CanvasBody.Children.Clear();
@@ -408,9 +413,8 @@ namespace KinectSkeletonTracking
                             //表示
                             CanvasAncleleft.Text = str12;
 
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
+                        
+                            n++;
                         }
                     }
 
