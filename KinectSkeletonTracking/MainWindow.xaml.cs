@@ -1,8 +1,19 @@
 ﻿using System;
-using System.Linq;
-using System.Windows;
-using Microsoft.Kinect;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Microsoft.Kinect;
 
 namespace KinectSkeletonTracking
 {
@@ -37,7 +48,8 @@ namespace KinectSkeletonTracking
                 bodyFrameReader = kinect.BodyFrameSource.OpenReader();
                 //ここでイベントハンドラを追加する。Kinectが撮影したBodyのフレームデータが到着したときに通知される。
                 bodyFrameReader.FrameArrived += bodyFrameReader_FrameArrived;
-            }
+
+             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -70,27 +82,24 @@ namespace KinectSkeletonTracking
             SendRotate();    // 角度を取得して送信する
         }
 
-        private void DrawBodyFrame()
-        {
-            // ウィンドウサイズ変更を初期化？
-            CanvasBody.Children.Clear();
+       
 
-            foreach (var body in bodies.Where(b => b.IsTracked))
+        // ボディの更新をする。イベントハンドラ（フレームが取得できた、イベントが発生した ときにコールされる）
+        private void UpdateBodyFrame(BodyFrameArrivedEventArgs e)
+        {
+            
+            // usingブロック内で宣言された変数はGCに任せずに確実に開放される
+            // フレームはKinectから送られてくるデータの最小単位。e.FrameReference.AcquireFrame()で取得する。
+            using (var bodyFrame = e.FrameReference.AcquireFrame())
             {
-                foreach (var joint in body.Joints)
+                // nullが送られてくる可能性があるので、その場合は破棄。
+                if (bodyFrame == null)
                 {
-                    // 追跡状態
-                    if (joint.Value.TrackingState == TrackingState.Tracked)
-                    {
-                        // 骨格を描画する線の設定
-                        DrawEllipse(joint.Value, 10, Brushes.Blue);
-                    }
-                    // 推測状態
-                    else if(joint.Value.TrackingState==TrackingState.Inferred)
-                    {
-                        DrawEllipse(joint.Value, 10, Brushes.Yellow);
-                    }
+                    return;
                 }
+
+                // ボディデータをbodiesにコピーする
+                bodyFrame.GetAndRefreshBodyData(bodies);
             }
         }
 
@@ -112,33 +121,15 @@ namespace KinectSkeletonTracking
             }
 
             // 関節を円で描画
-            CanvasBody.SetLeft(ellipse, point.X - (R / 2));
-            CanvasBody.SetTop(ellipse, point.Y - (R / 2));
+            Canvas.SetLeft(ellipse, point.X - (R / 2));
+            Canvas.SetTop(ellipse, point.Y - (R / 2));
 
             CanvasBody.Children.Add(ellipse);
         }
 
-        // ボディの更新をする。イベントハンドラ（フレームが取得できた、イベントが発生した ときにコールされる）
-        private void UpdateBodyFrame(BodyFrameArrivedEventArgs e)
-        {
-            
-            // usingブロック内で宣言された変数はGCに任せずに確実に開放される
-            // フレームはKinectから送られてくるデータの最小単位。e.FrameReference.AcquireFrame()で取得する。
-            using (var bodyFrame = e.FrameReference.AcquireFrame())
-            {
-                // nullが送られてくる可能性があるので、その場合は破棄。
-                if (bodyFrame == null)
-                {
-                    return;
-                }
-
-                // ボディデータをbodiesにコピーする
-                bodyFrame.GetAndRefreshBodyData(bodies);
-            }
-        }
-
         private void SendRotate()
         {
+            CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
             {
@@ -148,6 +139,7 @@ namespace KinectSkeletonTracking
                     // 追跡可能な状態か？
                     if (joint.Value.TrackingState == TrackingState.Tracked)
                     {
+                        DrawEllipse(joint.Value, 10, Brushes.Blue);
                         // デバックのため右肘のピッチ軸を出力してみる
                         if (joint.Key == JointType.ElbowRight)
                         {
@@ -169,6 +161,10 @@ namespace KinectSkeletonTracking
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
                             Debug.WriteLine(((int)rollRotate).ToString());
                         }
+                    }
+                    else if (joint.Value.TrackingState == TrackingState.Inferred)
+                    {
+                        DrawEllipse(joint.Value, 10, Brushes.Yellow);
                     }
                 }
             }
