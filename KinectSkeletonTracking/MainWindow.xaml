@@ -11,10 +11,20 @@
     
     <Grid>
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
-        <TextBox x:Name="Canvasangle"  Width="30" Height="20" Margin="478,87,10.4,213.8" />
-        <TextBox x:Name="Canvasyo"  Width="30" Height="20" Margin="478,48,10.4,253.8" />
-        <TextBox x:Name="Canvasro"  Width="30" Height="20" Margin="478,10,10.4,293.8" />
-        
+        <TextBox x:Name="CanvasElbowright"  Width="30" Height="20" Margin="478,87,10.4,213.8" />
+        <TextBox x:Name="CanvasElbowleft"  Width="30" Height="20" Margin="478,48,10.4,253.8" />
+        <TextBox x:Name="CanvasHipright"  Width="30" Height="20" Margin="478,10,10.4,293.8" />
+        <TextBox x:Name="CanvasHipleft"  Width="30" Height="20" Margin="478,128,10.4,172.8" />
+        <TextBox x:Name="CanvasShourderright"  Width="30" Height="20" Margin="478,168,10.4,132.8" />
+        <TextBox x:Name="CanvasShourderleft"  Width="30" Height="20" Margin="478,208,10.4,92.8" />
+        <TextBox x:Name="CanvasKneeright"  Width="30" Height="20" Margin="10.4,10,478,293.8" />
+        <TextBox x:Name="CanvasKneeleft"  Width="30" Height="20" Margin="10,48,478.4,252.8" />
+        <TextBox x:Name="CanvasFootright"  Width="30" Height="20" Margin="10,86,478.4,214.8" />
+        <TextBox x:Name="CanvasFootleft"  Width="30" Height="20" Margin="10,128,478.4,172.8" />
+        <TextBox x:Name="CanvasSpinbase"  Width="30" Height="20" Margin="10,168,478.4,132.8" />
+        <TextBox x:Name="CanvasAncleright"  Width="30" Height="20" Margin="11,208,477.4,92.8" />
+        <TextBox x:Name="CanvasAncleleft"  Width="30" Height="20" Margin="11,248,477.4,52.8" />
+
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="TextBodyCount1"/>
             <TextBlock x:Name="TextBodyCount2"/>
