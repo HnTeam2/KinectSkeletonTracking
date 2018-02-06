@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
-
+using System.IO.Ports;
 namespace KinectSkeletonTracking
 {
     /// <summary>
@@ -23,7 +23,7 @@ namespace KinectSkeletonTracking
     public partial class MainWindow : Window
     {
         KinectSensor kinect;
-
+        int n = 0, a = 0;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
 
@@ -126,7 +126,30 @@ namespace KinectSkeletonTracking
 
             CanvasBody.Children.Add(ellipse);
         }
+        private void Serial_Send(string args)
+        {
 
+
+            SerialPort port = new SerialPort("COM11", 9600, Parity.None, 8, StopBits.One);
+            try
+            {
+                port.Open();
+
+                // フロー制御はしません。
+                port.DtrEnable = false;
+                port.RtsEnable = false;
+
+                port.WriteLine(args);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception: ", e.ToString());
+            }
+            port.Close();
+            port.Dispose();
+
+        }
         private void SendRotate()
         {
             CanvasBody.Children.Clear();
@@ -156,10 +179,15 @@ namespace KinectSkeletonTracking
                             string str = rollRotate.ToString();
                             //表示
                             Canvasangle.Text = str;
-                            
-                        
+                            a = n % 2;
+                            if (a == 1)
+                            {
+                                Debug.WriteLine(((int)rollRotate).ToString());
+                                Serial_Send(((int)rollRotate).ToString());
+                            }
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
+
+                            n++;
                         }
                     }
                     else if (joint.Value.TrackingState == TrackingState.Inferred)
