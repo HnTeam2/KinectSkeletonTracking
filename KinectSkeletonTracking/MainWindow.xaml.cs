@@ -126,11 +126,11 @@ namespace KinectSkeletonTracking
 
             CanvasBody.Children.Add(ellipse);
         }
-        private void Serial_Send(string args)
+        private void Serial_Send(byte[] args)
         {
 
 
-            SerialPort port = new SerialPort("COM11", 9600, Parity.None, 8, StopBits.One);
+            SerialPort port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
             try
             {
                 port.Open();
@@ -138,7 +138,7 @@ namespace KinectSkeletonTracking
                 // フロー制御はしません。
                 port.DtrEnable = false;
                 port.RtsEnable = false;
-                port.WriteLine(args);
+               port.Write(args, 0, 5);
             }
             catch (Exception e)
             {
@@ -170,7 +170,7 @@ namespace KinectSkeletonTracking
                             //関節のそれぞれの軸に対応する角度を取得する
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = CalcRotate.Roll(orientation);
+                            var rollRotate = (int)CalcRotate.Roll(orientation);
 
 
                             //Textで表示させるためにstring型へ変換
@@ -181,7 +181,14 @@ namespace KinectSkeletonTracking
                             if (a == 1)
                             {
                                 Debug.WriteLine(((int)rollRotate).ToString());
-                                Serial_Send("5:"+((int)rollRotate).ToString());
+
+                                var value=(rollRotate / 270) * (9500 - 5500) + 5500;
+                                byte low = (byte)(value & 0xff);
+                                byte high = (byte)(value >> 8);
+                                high = (byte)(value & 0xff);
+
+                                byte[] data = {(byte)'C',(byte)'5',(byte)'V',low,high};
+                                Serial_Send(data);
                             }
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
 
