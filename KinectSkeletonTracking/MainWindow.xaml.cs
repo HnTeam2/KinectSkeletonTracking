@@ -138,13 +138,13 @@ namespace KinectSkeletonTracking
                 // フロー制御はしません。
                 port.DtrEnable = false;
                 port.RtsEnable = false;
-
+                port.WriteLine(args);
                 port.WriteLine(args);
 
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unexpected exception: ", e.ToString());
+               
             }
             port.Close();
             port.Dispose();
