@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
+
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
+
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.IO.Ports;
+
 namespace KinectSkeletonTracking
 {
     /// <summary>
@@ -130,7 +127,7 @@ namespace KinectSkeletonTracking
         {
 
 
-            SerialPort port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
+            SerialPort port = new SerialPort("COM11", 9600, Parity.None, 8, StopBits.One);
             try
             {
                 port.Open();
@@ -138,11 +135,12 @@ namespace KinectSkeletonTracking
                 // フロー制御はしません。
                 port.DtrEnable = false;
                 port.RtsEnable = false;
-               port.Write(args, 0, 5);
+               port.Write(args,0,5);
             }
             catch (Exception e)
             {
-
+                Debug.WriteLine("エラーが発生しました！");
+      
             }
             port.Close();
             port.Dispose();
@@ -170,7 +168,7 @@ namespace KinectSkeletonTracking
                             //関節のそれぞれの軸に対応する角度を取得する
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
+                            var rollRotate = (float)CalcRotate.Roll(orientation);
 
 
                             //Textで表示させるためにstring型へ変換
@@ -180,15 +178,16 @@ namespace KinectSkeletonTracking
                             a = n % 2;
                             if (a == 1)
                             {
-                                Debug.WriteLine(((int)rollRotate).ToString());
+                                Debug.WriteLine(rollRotate.ToString());
 
-                                var value=(rollRotate / 270) * (9500 - 5500) + 5500;
+                                var value=(int)((rollRotate / 270) * (9500 - 5500) + 5500);
                                 byte low = (byte)(value & 0xff);
                                 byte high = (byte)(value >> 8);
                                 high = (byte)(value & 0xff);
 
-                                byte[] data = {(byte)'C',(byte)'5',(byte)'V',low,high};
-                                Serial_Send(data);
+                                byte[] data = {(byte)'C',(byte)5,(byte)'V',low,high};
+                              Debug.WriteLine("C5V"+value);
+                              Serial_Send(data);
                             }
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
 
