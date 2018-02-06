@@ -147,8 +147,8 @@ namespace KinectSkeletonTracking
                             var orientation = body.JointOrientations[joint.Key].Orientation;
 
                             //関節のそれぞれの軸に対応する角度を取得する
-                            //var pitchRotate = CalcRotate.Pitch(orientation);
-                            //var yowRotate = CalcRotate.Yaw(orientation);
+                            var pitchRotate = CalcRotate.Pitch(orientation);
+                            var yowRotate = CalcRotate.Yaw(orientation);
                             var rollRotate = CalcRotate.Roll(orientation);
 
 

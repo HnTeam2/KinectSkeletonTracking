@@ -54,6 +54,8 @@ namespace KinectSkeletonTracking
             double yaw = Math.Atan2(value1, value2);
 
             return yaw * (180.0 / Math.PI);
+
+            //nasudayo
         }
     }
 }
