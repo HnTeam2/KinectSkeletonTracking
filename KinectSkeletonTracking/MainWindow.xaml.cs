@@ -127,11 +127,6 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
-            }
-            port.Close();
-            port.Dispose();
-
-        }
         private void SendRotate()
         {
             CanvasBody.Children.Clear();
@@ -413,8 +408,7 @@ namespace KinectSkeletonTracking
                             //表示
                             CanvasAncleleft.Text = str12;
 
-                        
-                            n++;
+ 
                         }
                     }
 
