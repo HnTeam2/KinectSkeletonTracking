@@ -139,8 +139,6 @@ namespace KinectSkeletonTracking
                 port.DtrEnable = false;
                 port.RtsEnable = false;
                 port.WriteLine(args);
-                port.WriteLine(args);
-
             }
             catch (Exception e)
             {
