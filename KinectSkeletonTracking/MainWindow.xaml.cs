@@ -183,7 +183,7 @@ namespace KinectSkeletonTracking
                             if (a == 1)
                             {
                                 Debug.WriteLine(((int)rollRotate).ToString());
-                                Serial_Send(((int)rollRotate).ToString());
+                                Serial_Send("5:"+((int)rollRotate).ToString());
                             }
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
 
