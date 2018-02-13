@@ -58,7 +58,7 @@ namespace KinectSkeletonTracking
         Console.WriteLine(sendMsg);
 
         //サーバーから送られたデータを受信する
-       /* System.IO.MemoryStream ms = new System.IO.MemoryStream();
+        System.IO.MemoryStream ms = new System.IO.MemoryStream();
         byte[] resBytes = new byte[256];
         int resSize = 0;
         do
@@ -78,7 +78,7 @@ ms.Close();
 
         //閉じる
         ns.Close();
-        tcp.Close();*/
+        tcp.Close();
     }
     
         // Windowが表示されたときコールされる
@@ -185,6 +185,7 @@ ms.Close();
                                 Debug.WriteLine(((int)rollRotate).ToString());
                                 socket(((int)rollRotate).ToString());
                             }
+                            n++;
                         }
                     }
                 }
