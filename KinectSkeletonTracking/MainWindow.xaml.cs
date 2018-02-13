@@ -21,70 +21,69 @@ namespace KinectSkeletonTracking
             InitializeComponent();
         }
 
-        private  void socket()
+        private  void socket(string sendMsg) { 
+         //サーバーに送信するデータを入力してもらう→何もなければ終了。
+        
+        if (sendMsg == null || sendMsg.Length == 0)
         {
-            //サーバーに送信するデータを入力してもらう→何もなければ終了。
-            Console.WriteLine("データを入力後Enterを押してください。");
-            string sendMsg = Console.ReadLine();
-            if (sendMsg == null || sendMsg.Length == 0)
-            {
-                return;
-            }
-
-            //サーバーのIPアドレスとポート番号？
-            string ipOrHost = "172.20.10.5";//←ここ ローカルは”127.0.0.1”
-            int port = 9999;
-
-            //サーバーと接続する（わからん）
-            System.Net.Sockets.TcpClient tcp =
-                new System.Net.Sockets.TcpClient(ipOrHost, port);
-            Console.WriteLine("サーバー({0}:{1})と接続しました({2}:{3})。",
-                ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
-                ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
-                ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Address,
-                ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Port);
-
-            //NetworkStreamを取得する
-            System.Net.Sockets.NetworkStream ns = tcp.GetStream();
-
-            //読み取り、書き込みのタイムアウトを”　”秒にする。
-            // ns.ReadTimeout = 30000;
-            //ns.WriteTimeout = 30000;
-
-            //サーバに　データを送信する,バイト型？
-            System.Text.Encoding enc = System.Text.Encoding.UTF8;
-            byte[] sendBytes = enc.GetBytes(sendMsg + '\n');
-
-            //データを送信する
-            ns.Write(sendBytes, 0, sendBytes.Length);
-            Console.WriteLine(sendMsg);
-
-            //サーバーから送られたデータを受信する
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            byte[] resBytes = new byte[256];
-            int resSize = 0;
-            do
-            {
-                //データを受信する、0だと切断してる判断。
-                resSize = ns.Read(resBytes, 0, resBytes.Length);
-                if (resSize == 0)
-                {
-                    Console.WriteLine("サーバーが切断しました。");
-                    break;
-                }
-                //受信したデータを蓄積する
-                ms.Write(resBytes, 0, resSize);
-            } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
-            string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
-            ms.Close();
-
-            //閉じる
-            ns.Close();
-            tcp.Close();
-            Console.WriteLine("切断しました。");
-
-            Console.ReadLine();
+            return;
         }
+
+        //サーバーのIPアドレスとポート番号？
+        string ipOrHost = "172.20.10.5";//←ここ ローカルは”127.0.0.1”
+        int port = 9999;
+
+        //サーバーと接続する（わからん）
+        System.Net.Sockets.TcpClient tcp =
+            new System.Net.Sockets.TcpClient(ipOrHost, port);
+        Console.WriteLine("サーバー({0}:{1})と接続しました({2}:{3})。",
+            ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
+            ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
+            ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Address,
+            ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Port);
+
+        //NetworkStreamを取得する
+        System.Net.Sockets.NetworkStream ns = tcp.GetStream();
+
+        //読み取り、書き込みのタイムアウトを”　”秒にする。
+         //ns.ReadTimeout = 30000;
+       // ns.WriteTimeout = 30000;
+
+        //サーバに　データを送信する,バイト型？
+        System.Text.Encoding enc = System.Text.Encoding.UTF8;
+        byte[] sendBytes = enc.GetBytes(sendMsg + '\n');
+
+        //データを送信する
+        ns.Write(sendBytes, 0, sendBytes.Length);
+        Console.WriteLine(sendMsg);
+
+        //サーバーから送られたデータを受信する
+        System.IO.MemoryStream ms = new System.IO.MemoryStream();
+        byte[] resBytes = new byte[256];
+        int resSize = 0;
+        do
+        {
+            //データを受信する、0だと切断してる判断。
+            resSize = ns.Read(resBytes, 0, resBytes.Length);
+            if (resSize == 0)
+            {
+                Console.WriteLine("サーバーが切断しました。");
+                break;
+            }
+    //受信したデータを蓄積する
+    ms.Write(resBytes, 0, resSize);
+        } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
+        string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
+ms.Close();
+
+        //閉じる
+        ns.Close();
+        tcp.Close();
+        Console.WriteLine("切断しました。");
+
+        Console.ReadLine();
+    }
+    
         // Windowが表示されたときコールされる
         private void Window_Loaded(object sensor, RoutedEventArgs e)
         {
@@ -155,6 +154,7 @@ namespace KinectSkeletonTracking
 
         private void SendRotate()
         {
+            
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
             {
@@ -165,7 +165,7 @@ namespace KinectSkeletonTracking
                     if (joint.Value.TrackingState == TrackingState.Tracked)
                     {
                         // デバックのため右肘のピッチ軸を出力してみる
-                        if (joint.Key == JointType.ElbowRight)
+                        if (joint.Key == JointType.ShoulderRight)
                         {
                             //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
                             var orientation = body.JointOrientations[joint.Key].Orientation;
@@ -174,9 +174,16 @@ namespace KinectSkeletonTracking
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
                             var rollRotate = CalcRotate.Roll(orientation);
-                        
+                            var value = (int)((rollRotate / 270) * (9500 - 5500) + 5500);
+                            byte low = (byte)(value & 0xff);
+                            byte high = (byte)(value >> 8);
+                            high = (byte)(value & 0xff);
+
+                            byte[] data = { (byte)'C', (byte)5, (byte)'V', low, high };
+                            
                             // TODO:↑の角度の値から必要なものをソケット通信で送信する
                             Debug.WriteLine(((int)rollRotate).ToString());
+                            socket(((int)rollRotate).ToString());
                         }
                     }
                 }
