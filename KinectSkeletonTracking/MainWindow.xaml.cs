@@ -12,7 +12,7 @@ namespace KinectSkeletonTracking
     public partial class MainWindow : Window
     {
         KinectSensor kinect;
-
+        int n = 0, a = 0;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
 
@@ -58,7 +58,7 @@ namespace KinectSkeletonTracking
         Console.WriteLine(sendMsg);
 
         //サーバーから送られたデータを受信する
-        System.IO.MemoryStream ms = new System.IO.MemoryStream();
+       /* System.IO.MemoryStream ms = new System.IO.MemoryStream();
         byte[] resBytes = new byte[256];
         int resSize = 0;
         do
@@ -78,10 +78,7 @@ ms.Close();
 
         //閉じる
         ns.Close();
-        tcp.Close();
-        Console.WriteLine("切断しました。");
-
-        Console.ReadLine();
+        tcp.Close();*/
     }
     
         // Windowが表示されたときコールされる
@@ -174,16 +171,20 @@ ms.Close();
                             //var pitchRotate = CalcRotate.Pitch(orientation);
                             //var yowRotate = CalcRotate.Yaw(orientation);
                             var rollRotate = CalcRotate.Roll(orientation);
-                            var value = (int)((rollRotate / 270) * (9500 - 5500) + 5500);
-                            byte low = (byte)(value & 0xff);
-                            byte high = (byte)(value >> 8);
-                            high = (byte)(value & 0xff);
+                            a = n % 2;
+                            if (a == 1)
+                            {
+                                var value = (int)((rollRotate / 270) * (9500 - 5500) + 5500);
+                                byte low = (byte)(value & 0xff);
+                                byte high = (byte)(value >> 8);
+                                high = (byte)(value & 0xff);
 
-                            byte[] data = { (byte)'C', (byte)5, (byte)'V', low, high };
-                            
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                            socket(((int)rollRotate).ToString());
+                                byte[] data = { (byte)'C', (byte)5, (byte)'V', low, high };
+
+                                // TODO:↑の角度の値から必要なものをソケット通信で送信する
+                                Debug.WriteLine(((int)rollRotate).ToString());
+                                socket(((int)rollRotate).ToString());
+                            }
                         }
                     }
                 }
