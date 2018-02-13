@@ -189,18 +189,22 @@ namespace KinectSkeletonTracking
                                 var yowRotate = CalcRotate.Yaw(orientation);
                                 var rollRotate = (int)CalcRotate.Roll(orientation);
 
+                                int R = (int)rollRotate;
+                                int Y = (int)yowRotate;
+                                int P = (int)pitchRotate;
+
 
                                 //Textで表示させるためにstring型へ変換
-                                string RollRotate = rollRotate.ToString();
-                                string YowRotate = yowRotate.ToString();
-                                string PitchRotate = pitchRotate.ToString();
+                                string RollRotate = R.ToString();
+                                string YowRotate = R.ToString();
+                                string PitchRotate = P.ToString();
                                 
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
                                 
                                 //Keyから値を取得
                                 TextBox textBox_num = textBox_joint[Key];
-                                textBox_num.Text = RollRotate+" "+YowRotate+" "+PitchRotate;
+                                textBox_num.Text = "R"+" "+RollRotate+" "+"Y"+" "+YowRotate+" "+"P"+" "+PitchRotate;
                                 
 
                                 // TODO:↑の角度の値から必要なものをソケット通信で送信する
