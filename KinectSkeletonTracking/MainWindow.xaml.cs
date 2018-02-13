@@ -133,7 +133,6 @@ namespace KinectSkeletonTracking
 
         private void SendRotate()
         {
-
             CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -192,13 +191,16 @@ namespace KinectSkeletonTracking
 
 
                                 //Textで表示させるためにstring型へ変換
-                                string str = rollRotate.ToString();
+                                string RollRotate = rollRotate.ToString();
+                                string YowRotate = yowRotate.ToString();
+                                string PitchRotate = pitchRotate.ToString();
                                 
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
                                 
                                 //Keyから値を取得
                                 TextBox textBox_num = textBox_joint[Key];
+                                textBox_num.Text = RollRotate+YowRotate+PitchRotate;
                                 
 
                                 // TODO:↑の角度の値から必要なものをソケット通信で送信する

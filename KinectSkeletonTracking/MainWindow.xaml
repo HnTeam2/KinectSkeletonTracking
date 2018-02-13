@@ -5,25 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KinectSkeletonTracking"
         mc:Ignorable="d"
-        Title="KinectSkelton" Height="350" Width="525"
+        Title="KinectSkelton" Height="1000" Width="1000"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
-    
+
     <Grid>
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
-        <TextBox x:Name="ElbowRight"  Width="30" Height="20" Margin="478,87,10.4,213.8" />
-        <TextBox x:Name="ElbowLeft"  Width="30" Height="20" Margin="478,48,10.4,253.8" />
-        <TextBox x:Name="HipRight"  Width="30" Height="20" Margin="478,10,10.4,293.8" />
-        <TextBox x:Name="HipLeft"  Width="30" Height="20" Margin="478,128,10.4,172.8" />
-        <TextBox x:Name="ShourderRight"  Width="30" Height="20" Margin="478,168,10.4,132.8" />
-        <TextBox x:Name="ShourderLeft"  Width="30" Height="20" Margin="478,208,10.4,92.8" />
-        <TextBox x:Name="KneeRight"  Width="30" Height="20" Margin="10.4,10,478,293.8" />
-        <TextBox x:Name="KneeLeft"  Width="30" Height="20" Margin="10,48,478.4,252.8" />
-        <TextBox x:Name="FootRight"  Width="30" Height="20" Margin="10,86,478.4,214.8" />
-        <TextBox x:Name="FootLeft"  Width="30" Height="20" Margin="10,128,478.4,172.8" />
-        <TextBox x:Name="SpinMid"  Width="30" Height="20" Margin="10,168,478.4,132.8" />
-        <TextBox x:Name="AncleRight"  Width="30" Height="20" Margin="11,208,477.4,92.8" />
-        <TextBox x:Name="AncleLeft"  Width="30" Height="20" Margin="11,248,477.4,52.8" />
+        <TextBox x:Name="HipLeft" Height="20" Margin="779,317,50.6,645.4" />
+        <TextBox x:Name="ElbowLeft" Height="20" Margin="779,135,50.6,815.4" />
+        <TextBox x:Name="ElbowRight" Height="20" Margin="779,50,50.6,900.4" />
+        <TextBox x:Name="HipRight"  Height="20" Margin="779,222,50.6,730.4" />
+        <TextBox x:Name="ShourderRight" Height="20" Margin="779,430,50.6,520.4" />
+        <TextBox x:Name="ShourderLeft"  Height="20" Margin="779,533,50.6,435.4" />
+        <TextBox x:Name="KneeRight" Height="20" Margin="50.6,50,779.6,900.4" />
+        <TextBox x:Name="KneeLeft" Height="20" Margin="51,135,779.6,815.4" />
+        <TextBox x:Name="FootRight" Height="20" Margin="51,222,779.6,728.4" />
+        <TextBox x:Name="FootLeft" Height="20" Margin="51,317,779.6,633.4" />
+        <TextBox x:Name="SpinMid" Height="20" Margin="51,430,779.6,520.4" />
+        <TextBox x:Name="AncleRight" Height="20" Margin="51,533,779.6,417.4" />
+        <TextBox x:Name="AncleLeft" Height="20" Margin="51,628,779.6,322.4" />
 
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="TextBodyCount1"/>
@@ -31,5 +31,5 @@
             <TextBlock x:Name="TextBodyCount3"/>
         </StackPanel>
     </Grid>
-    
+
 </Window>
