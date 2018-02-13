@@ -200,7 +200,7 @@ namespace KinectSkeletonTracking
                                 
                                 //Keyから値を取得
                                 TextBox textBox_num = textBox_joint[Key];
-                                textBox_num.Text = RollRotate+YowRotate+PitchRotate;
+                                textBox_num.Text = RollRotate+" "+YowRotate+" "+PitchRotate;
                                 
 
                                 // TODO:↑の角度の値から必要なものをソケット通信で送信する
