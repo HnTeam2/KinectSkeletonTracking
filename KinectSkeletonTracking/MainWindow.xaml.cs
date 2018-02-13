@@ -17,6 +17,7 @@ using Microsoft.Kinect;
 
 namespace KinectSkeletonTracking
 {
+
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
@@ -26,6 +27,7 @@ namespace KinectSkeletonTracking
 
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
+
 
         public MainWindow()
         {
@@ -49,7 +51,7 @@ namespace KinectSkeletonTracking
                 //ここでイベントハンドラを追加する。Kinectが撮影したBodyのフレームデータが到着したときに通知される。
                 bodyFrameReader.FrameArrived += bodyFrameReader_FrameArrived;
 
-             }
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -73,7 +75,7 @@ namespace KinectSkeletonTracking
                 kinect = null;
             }
         }
-        
+
         // イベント発生はこのメソッドに通知される？
         void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
@@ -82,12 +84,12 @@ namespace KinectSkeletonTracking
             SendRotate();    // 角度を取得して送信する
         }
 
-       
+
 
         // ボディの更新をする。イベントハンドラ（フレームが取得できた、イベントが発生した ときにコールされる）
         private void UpdateBodyFrame(BodyFrameArrivedEventArgs e)
         {
-            
+
             // usingブロック内で宣言された変数はGCに任せずに確実に開放される
             // フレームはKinectから送られてくるデータの最小単位。e.FrameReference.AcquireFrame()で取得する。
             using (var bodyFrame = e.FrameReference.AcquireFrame())
@@ -127,8 +129,11 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
+
+
         private void SendRotate()
         {
+
             CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -140,282 +145,74 @@ namespace KinectSkeletonTracking
                     if (joint.Value.TrackingState == TrackingState.Tracked)
                     {
                         DrawEllipse(joint.Value, 10, Brushes.Blue);
-                        // デバックのため右肘のピッチ軸を出力してみる
-                        if (joint.Key == JointType.ElbowRight)
+
+                        //JointTypeを配列を格納
+                        JointType[] useJointType = { JointType.ElbowRight, JointType.ElbowLeft, JointType.HipRight,JointType. HipLeft ,
+                                    JointType.ShoulderRight, JointType.ShoulderLeft, JointType.KneeRight, JointType.KneeLeft,
+                                    JointType.FootRight, JointType.FootLeft, JointType.SpineMid, JointType.AnkleRight, JointType.AnkleLeft,
+                                    };
+
+                       /* TextBox[] textBox_joint = new TextBox[13]{ ElbowRight, ElbowLeft, HipRight, HipLeft ,
+                                   ShourderRight, ShourderLeft, KneeRight, KneeLeft,
+                                   FootRight, FootLeft, SpinMid, AncleRight, AncleLeft,
+                                   };*/
+
+                        //連想配列
+                        Dictionary<JointType, TextBox> textBox_joint = new Dictionary<JointType, TextBox>
                         {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
+                            {JointType.ElbowRight,ElbowRight},
+                            {JointType.ElbowLeft,ElbowLeft},
+                            {JointType.HipRight,HipRight},
+                            {JointType.HipLeft,HipLeft},
+                            {JointType.ShoulderRight,ShourderRight},
+                            {JointType.ShoulderLeft,ShourderLeft},
+                            {JointType.KneeRight,KneeRight},
+                            {JointType.KneeLeft,KneeLeft},
+                            {JointType.FootRight,FootRight},
+                            {JointType.FootLeft,FootLeft},
+                            {JointType.SpineMid,SpinMid},
+                            {JointType.AnkleRight,AncleRight},
+                            {JointType.AnkleLeft,AncleLeft}
+                        };
+                       
 
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
+
+                        //foreachでJointTypeを網羅
+                        foreach (var jointType in useJointType)
+                        {
+                            if (joint.Key == jointType)
+                            {
+                                //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
+                                var orientation = body.JointOrientations[joint.Key].Orientation;
+
+                                //関節のそれぞれの軸に対応する角度を取得する
+                                var pitchRotate = CalcRotate.Pitch(orientation);
+                                var yowRotate = CalcRotate.Yaw(orientation);
+                                var rollRotate = (int)CalcRotate.Roll(orientation);
 
 
-                            //Textで表示させるためにstring型へ変換
-                            string str = rollRotate.ToString();
-                            //表示
-                            CanvasElbowright.Text = str;
-                            
-                        
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
+                                //Textで表示させるためにstring型へ変換
+                                string str = rollRotate.ToString();
+                                
+                                //DictionaryのKeyで値と一致
+                                var Key = jointType;
+                                
+                                //Keyから値を取得
+                                TextBox textBox_num = textBox_joint[Key];
+                                
+
+                                // TODO:↑の角度の値から必要なものをソケット通信で送信する
+                                Debug.WriteLine(((int)rollRotate).ToString());
+                            }
+
                         }
 
-                        if (joint.Key == JointType.ElbowLeft)
+
+
+                        if (joint.Value.TrackingState == TrackingState.Inferred)
                         {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str1 = rollRotate.ToString();
-                            //表示
-                            CanvasElbowleft.Text = str1;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
+                            DrawEllipse(joint.Value, 10, Brushes.Yellow);
                         }
-
-                        if (joint.Key == JointType.HipRight)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str2 = rollRotate.ToString();
-                            //表示
-                            CanvasHipright.Text = str2;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-                        if (joint.Key == JointType.HipLeft)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str3 = rollRotate.ToString();
-                            //表示
-                            CanvasHipleft.Text = str3;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.ShoulderRight)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str4 = rollRotate.ToString();
-                            //表示
-                            CanvasShourderright.Text = str4;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.ShoulderLeft)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str5 = rollRotate.ToString();
-                            //表示
-                            CanvasShourderleft.Text = str5;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.KneeRight)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str6 = rollRotate.ToString();
-                            //表示
-                            CanvasKneeright.Text = str6;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.KneeLeft)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str7 = rollRotate.ToString();
-                            //表示
-                            CanvasKneeleft.Text = str7;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.FootRight)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str8 = rollRotate.ToString();
-                            //表示
-                            CanvasFootright.Text = str8;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.FootLeft)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str9 = rollRotate.ToString();
-                            //表示
-                            CanvasFootleft.Text = str9;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.SpineMid)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str10 = rollRotate.ToString();
-                            //表示
-                            CanvasSpinbase.Text = str10;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.AnkleRight)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str11 = rollRotate.ToString();
-                            //表示
-                            CanvasAncleright.Text = str11;
-
-
-                            // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                            Debug.WriteLine(((int)rollRotate).ToString());
-                        }
-
-                        if (joint.Key == JointType.AnkleLeft)
-                        {
-                            //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                            var orientation = body.JointOrientations[joint.Key].Orientation;
-
-                            //関節のそれぞれの軸に対応する角度を取得する
-                            var pitchRotate = CalcRotate.Pitch(orientation);
-                            var yowRotate = CalcRotate.Yaw(orientation);
-                            var rollRotate = (int)CalcRotate.Roll(orientation);
-
-
-                            //Textで表示させるためにstring型へ変換
-                            string str12 = rollRotate.ToString();
-                            //表示
-                            CanvasAncleleft.Text = str12;
-
- 
-                        }
-                    }
-
-
-                    else if (joint.Value.TrackingState == TrackingState.Inferred)
-                    {
-                        DrawEllipse(joint.Value, 10, Brushes.Yellow);
                     }
                 }
             }
