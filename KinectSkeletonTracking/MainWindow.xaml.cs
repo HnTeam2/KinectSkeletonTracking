@@ -257,7 +257,7 @@ namespace KinectSkeletonTracking
                                     string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
-
+                                /*
                                 if (joint.Key == JointType.FootRight)
                                 {
                                     socket("0:"+RollRotate);
@@ -313,6 +313,53 @@ namespace KinectSkeletonTracking
                                 if (joint.Key == JointType.FootLeft)
                                 {
                                     socket("16:"+RollRotate);
+                                }*/
+                                switch (joint.Key)
+                                {
+                                    case JointType.FootRight:
+                                        socket("0:" + RollRotate);
+                                        break;
+                                    case JointType.AnkleRight:
+                                        socket("1:" + PitchRotate);
+                                        break;
+                                    case JointType.KneeRight:
+                                        socket("2:" + PitchRotate);
+                                        break;
+                                    case JointType.HipRight:
+                                        socket("3:" + RollRotate);
+                                        socket("4:" + RollRotate);
+                                        break;
+                                    case JointType.ElbowRight:
+                                        socket("5:" + PitchRotate);
+                                        break;
+                                    case JointType.ShoulderRight:
+                                        socket("6:" + RollRotate);
+                                        socket("7:" + PitchRotate);
+                                        break;
+                                    case JointType.SpineMid:
+                                        socket("8:" + YowRotate);
+                                        break;
+                                    case JointType.ShoulderLeft:
+                                        socket("9:" + PitchRotate);
+                                        socket("10:" + RollRotate);
+                                        break;
+                                    case JointType.ElbowLeft:
+                                        socket("11;" + PitchRotate);
+                                        break;
+                                    case JointType.HipLeft:
+                                        socket("12:" + RollRotate);
+                                        socket("13:" + PitchRotate);
+                                        break;
+                                    case JointType.KneeLeft:
+                                        socket("14:" + PitchRotate);
+                                        break;
+                                    case JointType.AnkleLeft:
+                                        socket("15:" + PitchRotate);
+                                        break;
+                                    case JointType.FootLeft:
+                                        socket("16:" + RollRotate);
+                                        break;
+
                                 }
 
                                 //DictionaryのKeyで値と一致
