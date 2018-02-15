@@ -24,7 +24,7 @@ namespace KinectSkeletonTracking
     public partial class MainWindow : Window
     {
         KinectSensor kinect;
-
+        int flag = 0;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
 
@@ -43,8 +43,8 @@ namespace KinectSkeletonTracking
             }
 
             //サーバーのIPアドレスとポート番号？
-            string ipOrHost = "172.20.10.5";//←ここ ローカルは”127.0.0.1”
-            int port = 9999;
+            string ipOrHost = "192.168.43.120";//←ここ ローカルは”127.0.0.1”
+            int port = 55555;
 
             //サーバーと接続する（わからん）
             System.Net.Sockets.TcpClient tcp =
@@ -314,52 +314,55 @@ namespace KinectSkeletonTracking
                                 {
                                     socket("16:"+RollRotate);
                                 }*/
-                                switch (joint.Key)
+                                if (flag == 1)
                                 {
-                                    case JointType.FootRight:
-                                        socket("0:" + RollRotate);
-                                        break;
-                                    case JointType.AnkleRight:
-                                        socket("1:" + PitchRotate);
-                                        break;
-                                    case JointType.KneeRight:
-                                        socket("2:" + PitchRotate);
-                                        break;
-                                    case JointType.HipRight:
-                                        socket("3:" + RollRotate);
-                                        socket("4:" + RollRotate);
-                                        break;
-                                    case JointType.ElbowRight:
-                                        socket("5:" + PitchRotate);
-                                        break;
-                                    case JointType.ShoulderRight:
-                                        socket("6:" + RollRotate);
-                                        socket("7:" + PitchRotate);
-                                        break;
-                                    case JointType.SpineMid:
-                                        socket("8:" + YowRotate);
-                                        break;
-                                    case JointType.ShoulderLeft:
-                                        socket("9:" + PitchRotate);
-                                        socket("10:" + RollRotate);
-                                        break;
-                                    case JointType.ElbowLeft:
-                                        socket("11;" + PitchRotate);
-                                        break;
-                                    case JointType.HipLeft:
-                                        socket("12:" + RollRotate);
-                                        socket("13:" + PitchRotate);
-                                        break;
-                                    case JointType.KneeLeft:
-                                        socket("14:" + PitchRotate);
-                                        break;
-                                    case JointType.AnkleLeft:
-                                        socket("15:" + PitchRotate);
-                                        break;
-                                    case JointType.FootLeft:
-                                        socket("16:" + RollRotate);
-                                        break;
+                                    switch (joint.Key)
+                                    {
+                                        case JointType.FootRight:
+                                            socket("0:" + RollRotate);
+                                            break;
+                                        case JointType.AnkleRight:
+                                            socket("1:" + PitchRotate);
+                                            break;
+                                        case JointType.KneeRight:
+                                            socket("2:" + PitchRotate);
+                                            break;
+                                        case JointType.HipRight:
+                                            socket("3:" + RollRotate);
+                                            socket("4:" + RollRotate);
+                                            break;
+                                        case JointType.ElbowRight:
+                                            socket("5:" + PitchRotate);
+                                            break;
+                                        case JointType.ShoulderRight:
+                                            socket("6:" + RollRotate);
+                                            socket("7:" + PitchRotate);
+                                            break;
+                                        case JointType.SpineMid:
+                                            socket("8:" + YowRotate);
+                                            break;
+                                        case JointType.ShoulderLeft:
+                                            socket("9:" + PitchRotate);
+                                            socket("10:" + RollRotate);
+                                            break;
+                                        case JointType.ElbowLeft:
+                                            socket("11;" + PitchRotate);
+                                            break;
+                                        case JointType.HipLeft:
+                                            socket("12:" + RollRotate);
+                                            socket("13:" + PitchRotate);
+                                            break;
+                                        case JointType.KneeLeft:
+                                            socket("14:" + PitchRotate);
+                                            break;
+                                        case JointType.AnkleLeft:
+                                            socket("15:" + PitchRotate);
+                                            break;
+                                        case JointType.FootLeft:
+                                            socket("16:" + RollRotate);
+                                            break;
 
+                                    }
                                 }
 
                                 //DictionaryのKeyで値と一致
@@ -369,12 +372,8 @@ namespace KinectSkeletonTracking
                                 TextBox textBox_num = textBox_joint[Key];
 
                                 textBox_num.Text = "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
-
-
-                                // TODO:↑の角度の値から必要なものをソケット通信で送信する
-                                Debug.WriteLine(textBox_joint[JointType.AnkleLeft]);
                             }
-
+                            flag = 1 - flag;
                         }
 
 
