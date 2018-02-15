@@ -33,28 +33,26 @@ namespace KinectSkeletonTracking
         {
             InitializeComponent();
         }
+
+        static void socket_open() {
+
+        }
         private void socket(string sendMsg)
         {
-            //サーバーに送信するデータを入力してもらう→何もなければ終了。
-
-            if (sendMsg == null || sendMsg.Length == 0)
-            {
-                return;
-            }
+            //string ipString = "172.20.10.5"; //ローカルは”127.0.0.1”
+           // System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse(ipString);
 
             //サーバーのIPアドレスとポート番号？
-            string ipOrHost = "192.168.43.120";//←ここ ローカルは”127.0.0.1”
+           string ipOrHost = "192.168.43.120";//←ここ ローカルは”127.0.0.1”
             int port = 55555;
-
             //サーバーと接続する（わからん）
-            System.Net.Sockets.TcpClient tcp =
+              System.Net.Sockets.TcpClient tcp =
                 new System.Net.Sockets.TcpClient(ipOrHost, port);
             Console.WriteLine("サーバー({0}:{1})と接続しました({2}:{3})。",
-                ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
-                ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
+              ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
+               ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
                 ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Address,
                 ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Port);
-
             //NetworkStreamを取得する
             System.Net.Sockets.NetworkStream ns = tcp.GetStream();
 
@@ -64,7 +62,7 @@ namespace KinectSkeletonTracking
 
             //サーバに　データを送信する,バイト型？
             System.Text.Encoding enc = System.Text.Encoding.UTF8;
-            byte[] sendBytes = enc.GetBytes(sendMsg + '\n');
+            byte[] sendBytes = enc.GetBytes(sendMsg);
 
             //データを送信する
             ns.Write(sendBytes, 0, sendBytes.Length);
@@ -87,11 +85,11 @@ namespace KinectSkeletonTracking
                 ms.Write(resBytes, 0, resSize);
             } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
             string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
-            ms.Close();
+           ms.Close();
 
             //閉じる
-            ns.Close();
-            tcp.Close();
+           //ns.Close();
+          //tcp.Close();
         }
         // Windowが表示されたときコールされる
         private void Window_Loaded(object sensor, RoutedEventArgs e)
@@ -257,66 +255,9 @@ namespace KinectSkeletonTracking
                                     string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
-                                /*
-                                if (joint.Key == JointType.FootRight)
-                                {
-                                    socket("0:"+RollRotate);
-                                }
-                                if (joint.Key == JointType.AnkleRight)
-                                {
-                                    socket("1:"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.KneeRight)
-                                {
-                                    socket("2:"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.HipRight)
-                                {
-                                    socket("3:"+RollRotate);
-                                    socket("4:"+RollRotate);
-                                }
-                                if (joint.Key == JointType.ElbowRight)
-                                {
-                                    socket("5:"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.ShoulderRight)
-                                {
-                                    socket("6:"+RollRotate);
-                                    socket("7:" +PitchRotate);
-                                }
-                                if (joint.Key == JointType.SpineMid)
-                                {
-                                    socket("8:"+YowRotate);
-                                }
-                                if (joint.Key == JointType.ShoulderLeft)
-                                {
-                                    socket("9:"+ PitchRotate);
-                                    socket("10:"+RollRotate);
-                                }
-                                if (joint.Key == JointType.ElbowLeft)
-                                {
-                                    socket("11;"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.HipLeft)
-                                {
-                                    socket("12:"+RollRotate);
-                                    socket("13:" + PitchRotate);
-                                }
-                                if (joint.Key == JointType.KneeLeft)
-                                {
-                                    socket("14:"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.AnkleLeft)
-                                {
-                                    socket("15:"+PitchRotate);
-                                }
-                                if (joint.Key == JointType.FootLeft)
-                                {
-                                    socket("16:"+RollRotate);
-                                }*/
                                 if (flag == 1)
                                 {
-                                    switch (joint.Key)
+                                    /*switch (joint.Key)           //KHR対応
                                     {
                                         case JointType.FootRight:
                                             socket("0:" + RollRotate);
@@ -328,7 +269,7 @@ namespace KinectSkeletonTracking
                                             socket("2:" + PitchRotate);
                                             break;
                                         case JointType.HipRight:
-                                            socket("3:" + RollRotate);
+                                            socket("3:" + PitchRotate);
                                             socket("4:" + RollRotate);
                                             break;
                                         case JointType.ElbowRight:
@@ -361,8 +302,33 @@ namespace KinectSkeletonTracking
                                         case JointType.FootLeft:
                                             socket("16:" + RollRotate);
                                             break;
+                                    }*/
+                                    
+                                    switch (joint.Key)          //ロボゼロ対応
+                                    {
+                                        case JointType.SpineMid:
+                                            socket("10:" + YowRotate);
+                                            socket("11:" + PitchRotate);
+                                            break;
+                                        case JointType.ElbowLeft:
+                                            socket("7:" + YowRotate);
+                                            socket("8:" + PitchRotate);
+                                            break;
+                                        case JointType.ShoulderLeft:
+                                            socket("6:" + RollRotate);
+                                            socket("5:" + PitchRotate);
+                                            break;
+                                        case JointType.ShoulderRight:
+                                            socket("3:" + RollRotate);
+                                            socket("4:" + PitchRotate);
+                                            break;
+                                        case JointType.ElbowRight:
+                                            socket("2:" + YowRotate);
+                                            socket("1:" + PitchRotate);
+                                            break;
 
                                     }
+
                                 }
 
                                 //DictionaryのKeyで値と一致
@@ -374,6 +340,7 @@ namespace KinectSkeletonTracking
                                 textBox_num.Text = "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
                             }
                             flag = 1 - flag;
+                            
                         }
 
 
