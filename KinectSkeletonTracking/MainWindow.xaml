@@ -5,18 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KinectSkeletonTracking"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="KinectSkelton" Height="1100" Width="1100"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
-    
-    <!--<Grid >
+
+    <Grid>
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
+        <TextBox x:Name="HipLeft" Width="180"  Height="20" Margin="779,0,50.6,500.4" />
+        <TextBox x:Name="ElbowLeft" Width="180" Height="20" Margin="779,0,50.6,700.4" />
+        <TextBox x:Name="ElbowRight" Width="180" Height="20" Margin="779,0,50.6,800.4" />
+        <TextBox x:Name="HipRight"  Width="180" Height="20" Margin="779,0,50.6,600.4" />
+        <TextBox x:Name="ShourderRight" Width="180" Height="20" Margin="779,0,50.6,400.4" />
+        <TextBox x:Name="ShourderLeft"  Width="180" Height="20" Margin="779,0,50.6,300.4" />
+        <TextBox x:Name="KneeRight" Width="180" Height="20" Margin="51,0,779.1,800.4" />
+        <TextBox x:Name="KneeLeft" Width="180" Height="20" Margin="51,0,779.1,700.4" />
+        <TextBox x:Name="FootRight" Width="180" Height="20" Margin="51,0,779.1,600.4" />
+        <TextBox x:Name="FootLeft" Width="180" Height="20" Margin="51,0,779.1,500.4" />
+        <TextBox x:Name="SpinMid" Width="180" Height="20" Margin="51,0,779.1,400.4" />
+        <TextBox x:Name="AncleRight" Width="180" Height="20" Margin="51,0,779.1,300.4" />
+        <TextBox x:Name="AncleLeft" Width="180" Height="20" Margin="51,0,779.1,200.4" />
+
         
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="TextBodyCount1"/>
             <TextBlock x:Name="TextBodyCount2"/>
             <TextBlock x:Name="TextBodyCount3"/>
         </StackPanel>
-    </Grid>-->
-    
+    </Grid>
+
 </Window>
