@@ -34,9 +34,6 @@ namespace KinectSkeletonTracking
             InitializeComponent();
         }
 
-        static void socket_open() {
-
-        }
         private void socket(string sendMsg)
         {
             //string ipString = "172.20.10.5"; //ローカルは”127.0.0.1”
