@@ -392,7 +392,7 @@ namespace KinectSkeletonTracking
                                             break;
 
                                     }
-
+                                    
                                 }
 
                                 //DictionaryのKeyで値と一致
