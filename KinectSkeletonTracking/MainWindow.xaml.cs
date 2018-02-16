@@ -15,9 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 
+
 namespace KinectSkeletonTracking
 {
-
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
@@ -27,6 +27,7 @@ namespace KinectSkeletonTracking
 
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
+        Body[] bodies2; // 二人目のBodyを保持する配列
 
 
         public MainWindow()
@@ -81,7 +82,12 @@ namespace KinectSkeletonTracking
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            SendRotate();    // 角度を取得して送信する
+            var task1 = Task.Run(() =>
+            {
+                SendRotate();
+            });
+          //  SendRotate();    // 角度を取得して送信する
+            
         }
 
 
@@ -129,9 +135,135 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
+        
 
 
         private void SendRotate()
+        {
+            CanvasBody.Children.Clear();
+
+            // 追跡しているBodyのみループする
+            foreach (var body in bodies.Where(b => b.IsTracked))
+            {
+
+                // Bodyから取得した全関節でループする。
+                foreach (var joint in body.Joints)
+                {
+                    // 追跡可能な状態か？
+                    if (joint.Value.TrackingState == TrackingState.Tracked)
+                    {
+                        DrawEllipse(joint.Value, 10, Brushes.Blue);
+
+                        //JointTypeを配列を格納
+                        JointType[] useJointType = { JointType.ElbowRight, JointType.ElbowLeft, JointType.HipRight,JointType. HipLeft ,
+                                    JointType.ShoulderRight, JointType.ShoulderLeft, JointType.KneeRight, JointType.KneeLeft,
+                                    JointType.FootRight, JointType.FootLeft, JointType.SpineMid, JointType.AnkleRight, JointType.AnkleLeft,
+                                    };
+
+                        /* TextBox[] textBox_joint = new TextBox[13]{ ElbowRight, ElbowLeft, HipRight, HipLeft ,
+                                    ShourderRight, ShourderLeft, KneeRight, KneeLeft,
+                                    FootRight, FootLeft, SpinMid, AncleRight, AncleLeft,
+                                    };*/
+
+                        //連想配列
+                        Dictionary<JointType, TextBox> textBox_joint = new Dictionary<JointType, TextBox>
+                        {
+                            {JointType.ElbowRight,ElbowRight},
+                            {JointType.ElbowLeft,ElbowLeft},
+                            {JointType.HipRight,HipRight},
+                            {JointType.HipLeft,HipLeft},
+                            {JointType.ShoulderRight,ShourderRight},
+                            {JointType.ShoulderLeft,ShourderLeft},
+                            {JointType.KneeRight,KneeRight},
+                            {JointType.KneeLeft,KneeLeft},
+                            {JointType.FootRight,FootRight},
+                            {JointType.FootLeft,FootLeft},
+                            {JointType.SpineMid,SpinMid},
+                            {JointType.AnkleRight,AncleRight},
+                            {JointType.AnkleLeft,AncleLeft}
+                        };
+
+                        //二人目の連想配列
+                        Dictionary<JointType, TextBox> textBox_joint2 = new Dictionary<JointType, TextBox>
+                        {
+                            {JointType.ElbowRight,ElbowRight2},
+                            {JointType.ElbowLeft,ElbowLeft2},
+                            {JointType.HipRight,HipRight2},
+                            {JointType.HipLeft,HipLeft2},
+                            {JointType.ShoulderRight,ShourderRight2},
+                            {JointType.ShoulderLeft,ShourderLeft2},
+                            {JointType.KneeRight,KneeRight2},
+                            {JointType.KneeLeft,KneeLeft2},
+                            {JointType.FootRight,FootRight2},
+                            {JointType.FootLeft,FootLeft2},
+                            {JointType.SpineMid,SpinMid2},
+                            {JointType.AnkleRight,AncleRight2},
+                            {JointType.AnkleLeft,AncleLeft2}
+                        };
+
+
+
+                        //foreachでJointTypeを網羅
+                        foreach (var jointType in useJointType)
+                        {
+                            if (joint.Key == jointType)
+                            {
+                                //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
+                                var orientation = body.JointOrientations[joint.Key].Orientation;
+
+                                //関節のそれぞれの軸に対応する角度を取得する
+                                var pitchRotate = CalcRotate.Pitch(orientation);
+                                var yowRotate = CalcRotate.Yaw(orientation);
+                                var rollRotate = (int)CalcRotate.Roll(orientation);
+
+                                int R = (int)rollRotate;
+                                int Y = (int)yowRotate;
+                                int P = (int)pitchRotate;
+
+
+                                // Textで表示させるためにstring型へ変換
+                                string RollRotate = R.ToString();
+                                string YowRotate = R.ToString();
+                                string PitchRotate = P.ToString();
+
+                                // DictionaryのKeyで値と一致
+                                var Key = jointType;
+
+                                //一人目の角度を表示
+                                if (body == bodies[0])
+                                {
+                                    //Keyから値を取得
+                                    TextBox textBox_num = textBox_joint[Key];
+                                    textBox_num.Text = textBox_joint[Key] + "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
+                                }
+
+                                //二人目の角度を表示
+                                if (body == bodies[1])
+                                {
+                                    TextBox textBox_num2 = textBox_joint2[Key];
+                                    textBox_num2.Text = textBox_joint2[Key]+"R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
+                                }
+
+
+
+                                // TODO:↑の角度の値から必要なものをソケット通信で送信する
+                                Debug.WriteLine(((int)rollRotate).ToString());
+                            }
+
+                        }
+
+
+
+                        if (joint.Value.TrackingState == TrackingState.Inferred)
+                        {
+                            DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                        }
+                    }
+                }
+            }
+        }
+
+            private void Sendbody2Rotate()
         {
             CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
@@ -225,3 +357,5 @@ namespace KinectSkeletonTracking
         }
     }
 }
+
+

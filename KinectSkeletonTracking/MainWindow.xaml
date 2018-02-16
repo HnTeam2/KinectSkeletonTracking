@@ -11,20 +11,33 @@
 
     <Grid>
         <Canvas x:Name="CanvasBody"  Width="512" Height="424"/>
-        <TextBox x:Name="HipLeft" Width="180"  Height="20" Margin="779,0,50.6,500.4" />
-        <TextBox x:Name="ElbowLeft" Width="180" Height="20" Margin="779,0,50.6,700.4" />
         <TextBox x:Name="ElbowRight" Width="180" Height="20" Margin="779,0,50.6,800.4" />
-        <TextBox x:Name="HipRight"  Width="180" Height="20" Margin="779,0,50.6,600.4" />
-        <TextBox x:Name="ShourderRight" Width="180" Height="20" Margin="779,0,50.6,400.4" />
-        <TextBox x:Name="ShourderLeft"  Width="180" Height="20" Margin="779,0,50.6,300.4" />
-        <TextBox x:Name="KneeRight" Width="180" Height="20" Margin="51,0,779.1,800.4" />
-        <TextBox x:Name="KneeLeft" Width="180" Height="20" Margin="51,0,779.1,700.4" />
-        <TextBox x:Name="FootRight" Width="180" Height="20" Margin="51,0,779.1,600.4" />
-        <TextBox x:Name="FootLeft" Width="180" Height="20" Margin="51,0,779.1,500.4" />
-        <TextBox x:Name="SpinMid" Width="180" Height="20" Margin="51,0,779.1,400.4" />
-        <TextBox x:Name="AncleRight" Width="180" Height="20" Margin="51,0,779.1,300.4" />
-        <TextBox x:Name="AncleLeft" Width="180" Height="20" Margin="51,0,779.1,200.4" />
+        <TextBox x:Name="ElbowLeft" Width="180" Height="20" Margin="779,0,50.6,750.4" />
+        <TextBox x:Name="HipRight"  Width="180" Height="20" Margin="779,0,50.6,700.4" />
+        <TextBox x:Name="HipLeft" Width="180"  Height="20" Margin="779,0,50.6,650.4" />
+        <TextBox x:Name="ShourderRight" Width="180" Height="20" Margin="779,0,50.6,600.4" />
+        <TextBox x:Name="ShourderLeft"  Width="180" Height="20" Margin="779,0,50.6,550.4" />
+        <TextBox x:Name="KneeRight" Width="180" Height="20" Margin="779,0,50.6,500.4" />
+        <TextBox x:Name="KneeLeft" Width="180" Height="20" Margin="779,0,50.6,450.4" />
+        <TextBox x:Name="FootRight" Width="180" Height="20" Margin="779,0,50.6,400.4" />
+        <TextBox x:Name="FootLeft" Width="180" Height="20" Margin="779,0,50.6,350.4" />
+        <TextBox x:Name="SpinMid" Width="180" Height="20" Margin="779,0,50.6,300.4" />
+        <TextBox x:Name="AncleRight" Width="180" Height="20" Margin="779,0,50.6,250.4" />
+        <TextBox x:Name="AncleLeft" Width="180" Height="20" Margin="779,0,50.6,200.4" />
 
+        <TextBox x:Name="ElbowRight2" Width="180" Height="20" Margin="51,0,779.1,800.4" />
+        <TextBox x:Name="ElbowLeft2" Width="180" Height="20" Margin="51,0,779.1,750.4" />
+        <TextBox x:Name="HipRight2" Width="180" Height="20" Margin="51,0,779.1,700.4" />
+        <TextBox x:Name="HipLeft2" Width="180" Height="20" Margin="51,0,779.1,650.4" />
+        <TextBox x:Name="ShourderRight2" Width="180" Height="20" Margin="51,0,779.1,600.4" />
+        <TextBox x:Name="ShourderLeft2" Width="180" Height="20" Margin="51,0,779.1,550.4" />
+        <TextBox x:Name="KneeRight2" Width="180" Height="20" Margin="51,0,779.1,500.4" />
+        <TextBox x:Name="KneeLeft2" Width="180" Height="20" Margin="51,0,779.1,450.4" />
+        <TextBox x:Name="FootRight2" Width="180" Height="20" Margin="51,0,779.1,400.4" />
+        <TextBox x:Name="FootLeft2" Width="180" Height="20" Margin="51,0,779.1,350.4" />
+        <TextBox x:Name="SpinMid2" Width="180" Height="20" Margin="51,0,779.1,300.4" />
+        <TextBox x:Name="AncleRight2" Width="180" Height="20" Margin="51,0,779.1,250.4" />
+        <TextBox x:Name="AncleLeft2" Width="180" Height="20" Margin="51,0,779.1,200.4" />
         
         <StackPanel Orientation="Vertical">
             <TextBlock x:Name="TextBodyCount1"/>
