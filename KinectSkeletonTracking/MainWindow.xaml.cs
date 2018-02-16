@@ -17,7 +17,68 @@ using Microsoft.Kinect;
 
 namespace KinectSkeletonTracking
 {
+    class Conection
+    {
+        public const string IpString = "127.0.0.1"; //PCのIPアドレスにする
+        private string resMsg;
+        private System.Net.IPAddress ipAdd;
+        private System.Net.Sockets.TcpListener listener;
+        private System.Net.Sockets.NetworkStream ns;
+        private System.IO.MemoryStream ms;
+        private System.Net.Sockets.TcpClient client;
+        private System.Text.Encoding enc;
+        private System.Net.Sockets.TcpClient tcp;
 
+        //-----//サーバ側の処理//-----//
+        public Conection(int port)
+        {
+            ipAdd = System.Net.IPAddress.Parse(IpString);
+            listener = new System.Net.Sockets.TcpListener(ipAdd, port);
+            //受信開始
+            listener.Start();
+            Console.WriteLine("Listenを開始しました({0}:{1})。",
+                ((System.Net.IPEndPoint)listener.LocalEndpoint).Address,
+                ((System.Net.IPEndPoint)listener.LocalEndpoint).Port);
+            //接続植え付け
+            client = listener.AcceptTcpClient();
+            Console.WriteLine("クライアント({0}:{1})と接続しました。",
+                ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address,
+                ((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Port);
+            //NetworkStream（ネットワークを読み書きの対象とする時のストリーム）うまくかけん)を取得
+            ns = client.GetStream();
+        }
+
+      
+
+        //-----//送信相手からデータを受け取る//-----//
+       
+
+        //-----//接続相手にデータを送信する//-----//
+        public void socket(string sendMsg)
+        {
+            enc = System.Text.Encoding.UTF8;
+            //クライアントに送る文字列を作成してデータを送信する
+            
+            //文字列をバイト型配列に変換
+            byte[] sendBytes = enc.GetBytes(sendMsg + '\n');
+            //データを送信する
+            ns.Write(sendBytes, 0, sendBytes.Length);
+            Console.WriteLine(sendMsg);
+        }
+
+        //-----//サーバ側のソケットを閉じる//-----//
+        public void serverClose()
+        {
+            ns.Close();
+            client.Close();
+            Console.WriteLine("クライアントとの接続終了");
+            listener.Stop();
+            Console.WriteLine("Listener終了");
+            Console.ReadLine();
+        }
+
+      
+    }
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
@@ -27,69 +88,74 @@ namespace KinectSkeletonTracking
         int flag = 0;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-
-
+        Conection server = new Conection(Port);
+        public const int Port = 9999;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void socket(string sendMsg)
-        {
-            //string ipString = "172.20.10.5"; //ローカルは”127.0.0.1”
-           // System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse(ipString);
+        /* private void socket(string sendMsg)
+         {
+             //string ipString = "172.20.10.5"; //ローカルは”127.0.0.1”
+            // System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse(ipString);
 
-            //サーバーのIPアドレスとポート番号？
-           string ipOrHost = "192.168.43.120";//←ここ ローカルは”127.0.0.1”
-            int port = 55555;
-            //サーバーと接続する（わからん）
-              System.Net.Sockets.TcpClient tcp =
-                new System.Net.Sockets.TcpClient(ipOrHost, port);
-            Console.WriteLine("サーバー({0}:{1})と接続しました({2}:{3})。",
-              ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
-               ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
-                ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Address,
-                ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Port);
-            //NetworkStreamを取得する
-            System.Net.Sockets.NetworkStream ns = tcp.GetStream();
+             //サーバーのIPアドレスとポート番号？
+            string ipOrHost = "192.168.43.120";//←ここ ローカルは”127.0.0.1”
+             int port = 55555;
+             //サーバーと接続する（わからん）
+               System.Net.Sockets.TcpClient tcp =
+                 new System.Net.Sockets.TcpClient(ipOrHost, port);
+             Console.WriteLine("サーバー({0}:{1})と接続しました({2}:{3})。",
+               ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Address,
+                ((System.Net.IPEndPoint)tcp.Client.RemoteEndPoint).Port,
+                 ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Address,
+                 ((System.Net.IPEndPoint)tcp.Client.LocalEndPoint).Port);
+             //NetworkStreamを取得する
+             System.Net.Sockets.NetworkStream ns = tcp.GetStream();
 
-            //読み取り、書き込みのタイムアウトを”　”秒にする。
-            ns.ReadTimeout = 30000;
-            ns.WriteTimeout = 30000;
+             //読み取り、書き込みのタイムアウトを”　”秒にする。
+             ns.ReadTimeout = 30000;
+             ns.WriteTimeout = 30000;
 
-            //サーバに　データを送信する,バイト型？
-            System.Text.Encoding enc = System.Text.Encoding.UTF8;
-            byte[] sendBytes = enc.GetBytes(sendMsg);
+             //サーバに　データを送信する,バイト型？
+             System.Text.Encoding enc = System.Text.Encoding.UTF8;
+             byte[] sendBytes = enc.GetBytes(sendMsg);
 
-            //データを送信する
-            ns.Write(sendBytes, 0, sendBytes.Length);
-            Console.WriteLine(sendMsg);
+             //データを送信する
+             ns.Write(sendBytes, 0, sendBytes.Length);
+             Console.WriteLine(sendMsg);
 
-            //サーバーから送られたデータを受信する
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            byte[] resBytes = new byte[256];
-            int resSize = 0;
-            do
-            {
-                //データを受信する、0だと切断してる判断。
-                resSize = ns.Read(resBytes, 0, resBytes.Length);
-                if (resSize == 0)
-                {
-                    Console.WriteLine("サーバーが切断しました。");
-                    break;
-                }
-                //受信したデータを蓄積する
-                ms.Write(resBytes, 0, resSize);
-            } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
-            string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
-           ms.Close();
+             //サーバーから送られたデータを受信する
+             System.IO.MemoryStream ms = new System.IO.MemoryStream();
+             byte[] resBytes = new byte[256];
+             int resSize = 0;
+             do
+             {
+                 //データを受信する、0だと切断してる判断。
+                 resSize = ns.Read(resBytes, 0, resBytes.Length);
+                 if (resSize == 0)
+                 {
+                     Console.WriteLine("サーバーが切断しました。");
+                     break;
+                 }
+                 //受信したデータを蓄積する
+                 ms.Write(resBytes, 0, resSize);
+             } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
+             string resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
+            ms.Close();
 
-            //閉じる
-           //ns.Close();
-          //tcp.Close();
-        }
-        // Windowが表示されたときコールされる
-        private void Window_Loaded(object sensor, RoutedEventArgs e)
+             //閉じる
+            //ns.Close();
+           //tcp.Close();
+         }*/
+
+     
+
+       
+    
+    // Windowが表示されたときコールされる
+    private void Window_Loaded(object sensor, RoutedEventArgs e)
         {
             try
             {
@@ -187,6 +253,7 @@ namespace KinectSkeletonTracking
 
         private void SendRotate()
         {
+            
             CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -257,71 +324,71 @@ namespace KinectSkeletonTracking
                                     /*switch (joint.Key)           //KHR対応
                                     {
                                         case JointType.FootRight:
-                                            socket("0:" + RollRotate);
+                                            server.socket("0:" + RollRotate);
                                             break;
                                         case JointType.AnkleRight:
-                                            socket("1:" + PitchRotate);
+                                            server.socket("1:" + PitchRotate);
                                             break;
                                         case JointType.KneeRight:
-                                            socket("2:" + PitchRotate);
+                                            server.socket("2:" + PitchRotate);
                                             break;
                                         case JointType.HipRight:
-                                            socket("3:" + PitchRotate);
-                                            socket("4:" + RollRotate);
+                                            server.socket("3:" + PitchRotate);
+                                            server.socket("4:" + RollRotate);
                                             break;
                                         case JointType.ElbowRight:
-                                            socket("5:" + PitchRotate);
+                                            server.socket("5:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderRight:
-                                            socket("6:" + RollRotate);
-                                            socket("7:" + PitchRotate);
+                                            server.socket("6:" + RollRotate);
+                                            server.socket("7:" + PitchRotate);
                                             break;
                                         case JointType.SpineMid:
-                                            socket("8:" + YowRotate);
+                                            server.socket("8:" + YowRotate);
                                             break;
                                         case JointType.ShoulderLeft:
-                                            socket("9:" + PitchRotate);
-                                            socket("10:" + RollRotate);
+                                            server.socket("9:" + PitchRotate);
+                                            server.socket("10:" + RollRotate);
                                             break;
                                         case JointType.ElbowLeft:
-                                            socket("11;" + PitchRotate);
+                                            server.socket("11;" + PitchRotate);
                                             break;
                                         case JointType.HipLeft:
-                                            socket("12:" + RollRotate);
-                                            socket("13:" + PitchRotate);
+                                            server.socket("12:" + RollRotate);
+                                            server.socket("13:" + PitchRotate);
                                             break;
                                         case JointType.KneeLeft:
-                                            socket("14:" + PitchRotate);
+                                            server.socket("14:" + PitchRotate);
                                             break;
                                         case JointType.AnkleLeft:
-                                            socket("15:" + PitchRotate);
+                                            server.socket("15:" + PitchRotate);
                                             break;
                                         case JointType.FootLeft:
-                                            socket("16:" + RollRotate);
+                                            server.socket("16:" + RollRotate);
                                             break;
                                     }*/
                                     
                                     switch (joint.Key)          //ロボゼロ対応
                                     {
                                         case JointType.SpineMid:
-                                            socket("10:" + YowRotate);
-                                            socket("11:" + PitchRotate);
+                                           server.socket("10:" + YowRotate);
+                                            server.socket("11:" + PitchRotate);
                                             break;
                                         case JointType.ElbowLeft:
-                                            socket("7:" + YowRotate);
-                                            socket("8:" + PitchRotate);
+                                            server.socket("7:" + YowRotate);
+                                            server.socket("8:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderLeft:
-                                            socket("6:" + RollRotate);
-                                            socket("5:" + PitchRotate);
+                                            server.socket("6:" + RollRotate);
+                                            server.socket("5:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderRight:
-                                            socket("3:" + RollRotate);
-                                            socket("4:" + PitchRotate);
+                                            server.socket("3:" + RollRotate);
+                                            server.socket("4:" + PitchRotate);
                                             break;
                                         case JointType.ElbowRight:
-                                            socket("2:" + YowRotate);
-                                            socket("1:" + PitchRotate);
+                                            server.socket("2:" + YowRotate);
+                                            server.socket("1:" + PitchRotate);
                                             break;
 
                                     }
@@ -349,6 +416,7 @@ namespace KinectSkeletonTracking
                     }
                 }
             }
+            server.serverClose();
         }
     }
 }
