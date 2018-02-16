@@ -19,8 +19,7 @@ namespace KinectSkeletonTracking
 {
     class Conection
     {
-        public const string IpString = "127.0.0.1"; //PCのIPアドレスにする
-        private string resMsg;
+        public const string IpString = "192.168.43.181"; //PCのIPアドレスにする
         private System.Net.IPAddress ipAdd;
         private System.Net.Sockets.TcpListener listener;
         private System.Net.Sockets.NetworkStream ns;
@@ -50,7 +49,6 @@ namespace KinectSkeletonTracking
 
       
 
-        //-----//送信相手からデータを受け取る//-----//
        
 
         //-----//接続相手にデータを送信する//-----//
@@ -60,7 +58,7 @@ namespace KinectSkeletonTracking
             //クライアントに送る文字列を作成してデータを送信する
             
             //文字列をバイト型配列に変換
-            byte[] sendBytes = enc.GetBytes(sendMsg + '\n');
+            byte[] sendBytes = enc.GetBytes(sendMsg);
             //データを送信する
             ns.Write(sendBytes, 0, sendBytes.Length);
             Console.WriteLine(sendMsg);
@@ -85,11 +83,11 @@ namespace KinectSkeletonTracking
     public partial class MainWindow : Window
     {
         KinectSensor kinect;
-        int flag = 0;
+        int flag = 0,n=0;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
         Conection server = new Conection(Port);
-        public const int Port = 9999;
+        public const int Port = 55555;
         public MainWindow()
         {
             InitializeComponent();
@@ -319,6 +317,7 @@ namespace KinectSkeletonTracking
                                     string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
+                                flag = n % 3;
                                 if (flag == 1)
                                 {
                                     /*switch (joint.Key)           //KHR対応
@@ -389,7 +388,7 @@ namespace KinectSkeletonTracking
                                         case JointType.ElbowRight:
                                             server.socket("2:" + YowRotate);
                                             server.socket("1:" + PitchRotate);
-                                            break;
+                                            break;  
 
                                     }
                                     
@@ -403,8 +402,8 @@ namespace KinectSkeletonTracking
 
                                 textBox_num.Text = "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
                             }
-                            flag = 1 - flag;
-                            
+                            //flag = 1 - flag;
+                            n++;
                         }
 
 
@@ -416,7 +415,6 @@ namespace KinectSkeletonTracking
                     }
                 }
             }
-            server.serverClose();
         }
     }
 }
