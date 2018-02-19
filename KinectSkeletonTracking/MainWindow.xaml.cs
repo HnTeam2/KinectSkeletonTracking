@@ -84,10 +84,12 @@ namespace KinectSkeletonTracking
     {
         KinectSensor kinect;
         int flag = 0,n=0;
+        public const int Port1 = 55555;
+        public const int Port2 = 9999;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-        Conection server = new Conection(Port);
-        public const int Port = 55555;
+        Conection server1 = new Conection(Port1);
+        Conection server2 = new Conection(Port2);
         public MainWindow()
         {
             InitializeComponent();
@@ -323,71 +325,71 @@ namespace KinectSkeletonTracking
                                     /*switch (joint.Key)           //KHR対応
                                     {
                                         case JointType.FootRight:
-                                            server.socket("0:" + RollRotate);
+                                            server2.socket("0:" + RollRotate);
                                             break;
                                         case JointType.AnkleRight:
-                                            server.socket("1:" + PitchRotate);
+                                            server2.socket("1:" + PitchRotate);
                                             break;
                                         case JointType.KneeRight:
-                                            server.socket("2:" + PitchRotate);
+                                            server2.socket("2:" + PitchRotate);
                                             break;
                                         case JointType.HipRight:
-                                            server.socket("3:" + PitchRotate);
-                                            server.socket("4:" + RollRotate);
+                                            server2.socket("3:" + PitchRotate);
+                                            server2.socket("4:" + RollRotate);
                                             break;
                                         case JointType.ElbowRight:
-                                            server.socket("5:" + PitchRotate);
+                                            server2.socket("5:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderRight:
-                                            server.socket("6:" + RollRotate);
-                                            server.socket("7:" + PitchRotate);
+                                            server2.socket("6:" + RollRotate);
+                                            server2.socket("7:" + PitchRotate);
                                             break;
                                         case JointType.SpineMid:
-                                            server.socket("8:" + YowRotate);
+                                            server2.socket("8:" + YowRotate);
                                             break;
                                         case JointType.ShoulderLeft:
-                                            server.socket("9:" + PitchRotate);
-                                            server.socket("10:" + RollRotate);
+                                            server2.socket("9:" + PitchRotate);
+                                            server2.socket("10:" + RollRotate);
                                             break;
                                         case JointType.ElbowLeft:
                                             server.socket("11;" + PitchRotate);
                                             break;
                                         case JointType.HipLeft:
-                                            server.socket("12:" + RollRotate);
-                                            server.socket("13:" + PitchRotate);
+                                            server2.socket("12:" + RollRotate);
+                                            server2.socket("13:" + PitchRotate);
                                             break;
                                         case JointType.KneeLeft:
-                                            server.socket("14:" + PitchRotate);
+                                            server2.socket("14:" + PitchRotate);
                                             break;
                                         case JointType.AnkleLeft:
-                                            server.socket("15:" + PitchRotate);
+                                            server2.socket("15:" + PitchRotate);
                                             break;
                                         case JointType.FootLeft:
-                                            server.socket("16:" + RollRotate);
+                                            server2.socket("16:" + RollRotate);
                                             break;
                                     }*/
                                     
                                     switch (joint.Key)          //ロボゼロ対応
                                     {
                                         case JointType.SpineMid:
-                                           server.socket("10:" + YowRotate);
-                                            server.socket("11:" + PitchRotate);
+                                           server1.socket("10:" + YowRotate);
+                                            server1.socket("11:" + PitchRotate);
                                             break;
                                         case JointType.ElbowLeft:
-                                            server.socket("7:" + YowRotate);
-                                            server.socket("8:" + PitchRotate);
+                                            server1.socket("7:" + YowRotate);
+                                            server1.socket("8:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderLeft:
-                                            server.socket("6:" + RollRotate);
-                                            server.socket("5:" + PitchRotate);
+                                            server1.socket("6:" + RollRotate);
+                                            server1.socket("5:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderRight:
-                                            server.socket("3:" + RollRotate);
-                                            server.socket("4:" + PitchRotate);
+                                            server1.socket("3:" + RollRotate);
+                                            server1.socket("4:" + PitchRotate);
                                             break;
                                         case JointType.ElbowRight:
-                                            server.socket("2:" + YowRotate);
-                                            server.socket("1:" + PitchRotate);
+                                            server1.socket("2:" + YowRotate);
+                                            server1.socket("1:" + PitchRotate);
                                             break;  
 
                                     }
@@ -400,7 +402,7 @@ namespace KinectSkeletonTracking
                                 //Keyから値を取得
                                 TextBox textBox_num = textBox_joint[Key];
 
-                                textBox_num.Text = "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
+                                textBox_num.Text = joint.Key+"R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
                             }
                             //flag = 1 - flag;
                             n++;
