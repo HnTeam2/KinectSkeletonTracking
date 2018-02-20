@@ -265,6 +265,22 @@ namespace KinectSkeletonTracking
 
             return angleAMB;
         }
+        public static double XZ(Joint cen, Joint first, Joint second)
+        {
+            const double M_PI = 3.1415926535897;
+
+            double ma_x = first.Position.X - cen.Position.X;
+            double ma_y = first.Position.Z - cen.Position.Z;
+            double mb_x = second.Position.X - cen.Position.X;
+            double mb_y = second.Position.Z - cen.Position.Z;
+            double v1 = (ma_x * mb_x) + (ma_y * mb_y);
+            double ma_val = Math.Sqrt(ma_x * ma_x + ma_y * ma_y);
+            double mb_val = Math.Sqrt(mb_x * mb_x + mb_y * mb_y);
+            double cosM = v1 / (ma_val * mb_val);
+            double angleAMB = Math.Acos(cosM) * 180 / M_PI;
+
+            return angleAMB;
+        }
 
         private void SendRotate()
         {
@@ -357,8 +373,12 @@ namespace KinectSkeletonTracking
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
                                 int X = (int)Angle(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineBase], body.Joints[JointType.ElbowRight]);
+                                int Z = (int)XZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineBase], body.Joints[JointType.ElbowRight]);
                                 X = X - 75;
+                                Z = 107 - Z;
+                                if (Z > 0) Z=Z * 2;
                                 string Xing = X.ToString();
+                                string Zing = Z.ToString();
                                 flag = n % 3;
                                 if (flag == 1)
                                 {
@@ -425,8 +445,8 @@ namespace KinectSkeletonTracking
                                             break;*/
                                         case JointType.ShoulderRight:
                                           server1.socket("3:" + Xing);
-                                            Debug.WriteLine(Xing);
-                                           // server1.socket("4:" + PitchRotate);
+                                            
+                                           server1.socket("4:" + Zing);
                                             break;
                                         //case JointType.ElbowRight:
                                           //  server1.socket("2:" + YowRotate);
