@@ -82,10 +82,10 @@ namespace KinectSkeletonTracking
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            var task1 = Task.Run(() =>
-            {
+           // var task1 = Task.Run(() =>
+            //{
                 SendRotate();
-            });
+            //});
           //  SendRotate();    // 角度を取得して送信する
             
         }
@@ -145,7 +145,8 @@ namespace KinectSkeletonTracking
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
             {
-
+                int count=0;
+                
                 // Bodyから取得した全関節でループする。
                 foreach (var joint in body.Joints)
                 {
@@ -230,7 +231,7 @@ namespace KinectSkeletonTracking
                                 var Key = jointType;
 
                                 //一人目の角度を表示
-                                if (body == bodies[0])
+                                if (count == 0)
                                 {
                                     //Keyから値を取得
                                     TextBox textBox_num = textBox_joint[Key];
@@ -238,14 +239,14 @@ namespace KinectSkeletonTracking
                                 }
 
                                 //二人目の角度を表示
-                                if (body == bodies[1])
+                                if (count == 1)
                                 {
                                     TextBox textBox_num2 = textBox_joint2[Key];
                                     textBox_num2.Text = textBox_joint2[Key]+"R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
                                 }
 
 
-
+                                count++;
                                 // TODO:↑の角度の値から必要なものをソケット通信で送信する
                                 Debug.WriteLine(((int)rollRotate).ToString());
                             }
@@ -263,7 +264,7 @@ namespace KinectSkeletonTracking
             }
         }
 
-            private void Sendbody2Rotate()
+     /*       private void Sendbody2Rotate()
         {
             CanvasBody.Children.Clear();
             // 追跡しているBodyのみループする
@@ -283,10 +284,10 @@ namespace KinectSkeletonTracking
                                     JointType.FootRight, JointType.FootLeft, JointType.SpineMid, JointType.AnkleRight, JointType.AnkleLeft,
                                     };
 
-                       /* TextBox[] textBox_joint = new TextBox[13]{ ElbowRight, ElbowLeft, HipRight, HipLeft ,
+                        TextBox[] textBox_joint = new TextBox[13]{ ElbowRight, ElbowLeft, HipRight, HipLeft ,
                                    ShourderRight, ShourderLeft, KneeRight, KneeLeft,
                                    FootRight, FootLeft, SpinMid, AncleRight, AncleLeft,
-                                   };*/
+                                   };
 
                         //連想配列
                         Dictionary<JointType, TextBox> textBox_joint = new Dictionary<JointType, TextBox>
@@ -354,7 +355,7 @@ namespace KinectSkeletonTracking
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
