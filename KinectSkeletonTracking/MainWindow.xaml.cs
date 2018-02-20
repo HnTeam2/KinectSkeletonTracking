@@ -184,7 +184,7 @@ namespace KinectSkeletonTracking
                         };
 
                         //二人目の連想配列
-                        Dictionary<JointType, TextBox> textBox_joint2 = new Dictionary<JointType, TextBox>
+                      /*  Dictionary<JointType, TextBox> textBox_joint2 = new Dictionary<JointType, TextBox>
                         {
                             {JointType.ElbowRight,ElbowRight2},
                             {JointType.ElbowLeft,ElbowLeft2},
@@ -199,7 +199,7 @@ namespace KinectSkeletonTracking
                             {JointType.SpineMid,SpinMid2},
                             {JointType.AnkleRight,AncleRight2},
                             {JointType.AnkleLeft,AncleLeft2}
-                        };
+                        };*/
 
 
 
