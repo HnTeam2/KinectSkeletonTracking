@@ -84,12 +84,12 @@ namespace KinectSkeletonTracking
     {
         KinectSensor kinect;
         int flag = 0,n=0;
-        public const int Port1 = 55555;
+        public const int Port = 55555;
         public const int Port2 = 9999;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-        Conection server1 = new Conection(Port1);
-        Conection server2 = new Conection(Port2);
+       Conection server1 = new Conection(Port);
+        //Conection server2 = new Conection(Port2);
         public MainWindow()
         {
             InitializeComponent();
@@ -249,7 +249,22 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
+        public static double Angle(Joint cen , Joint first, Joint second)
+        {
+            const double M_PI = 3.1415926535897;
 
+            double ma_x = first.Position.X - cen.Position.X;
+            double ma_y = first.Position.Y - cen.Position.Y;
+            double mb_x = second.Position.X - cen.Position.X;
+            double mb_y = second.Position.Y - cen.Position.Y;
+            double v1 = (ma_x * mb_x) + (ma_y * mb_y);
+            double ma_val = Math.Sqrt(ma_x * ma_x + ma_y * ma_y);
+            double mb_val = Math.Sqrt(mb_x * mb_x + mb_y * mb_y);
+            double cosM = v1 / (ma_val * mb_val);
+            double angleAMB = Math.Acos(cosM) * 180 / M_PI;
+
+            return angleAMB;
+        }
 
         private void SendRotate()
         {
@@ -269,12 +284,12 @@ namespace KinectSkeletonTracking
                         //JointTypeを配列を格納
                         JointType[] useJointType = { JointType.ElbowRight, JointType.ElbowLeft, JointType.HipRight,JointType. HipLeft ,
                                     JointType.ShoulderRight, JointType.ShoulderLeft, JointType.KneeRight, JointType.KneeLeft,
-                                    JointType.FootRight, JointType.FootLeft, JointType.SpineMid, JointType.AnkleRight, JointType.AnkleLeft,
+                                    JointType.HandRight, JointType.HandLeft, JointType.SpineMid, JointType.AnkleRight, JointType.AnkleLeft,
                                     };
 
                         /* TextBox[] textBox_joint = new TextBox[13]{ ElbowRight, ElbowLeft, HipRight, HipLeft ,
                                     ShourderRight, ShourderLeft, KneeRight, KneeLeft,
-                                    FootRight, FootLeft, SpinMid, AncleRight, AncleLeft,
+                                    HandRight, HandLeft, SpinMid, AncleRight, AncleLeft,
                                     };*/
 
                         //連想配列
@@ -288,8 +303,8 @@ namespace KinectSkeletonTracking
                             {JointType.ShoulderLeft,ShourderLeft},
                             {JointType.KneeRight,KneeRight},
                             {JointType.KneeLeft,KneeLeft},
-                            {JointType.FootRight,FootRight},
-                            {JointType.FootLeft,FootLeft},
+                            {JointType.HandRight,HandRight},
+                            {JointType.HandLeft,HandLeft},
                             {JointType.SpineMid,SpinMid},
                             {JointType.AnkleRight,AncleRight},
                             {JointType.AnkleLeft,AncleLeft}
@@ -314,11 +329,36 @@ namespace KinectSkeletonTracking
                                 int R = (int)rollRotate;
                                 int Y = (int)yowRotate;
                                 int P = (int)pitchRotate;
+                                switch (joint.Key)          //ロボゼロ対応
+                                {
+                                    case JointType.SpineMid:
+                                        if (Y < -45) Y = -45;
+                                        if (Y >45) Y = 45;
+                                        if (P > 0) P = 0 - P;
+                                        P = P + 130;
+                                        if (P > 45) P = 45;
+                                        if (P < -45) P = -45;
+                                        break;
+                                    case JointType.ElbowRight:
+                                        if (P > 0) P = 0 - P;
+                                        P = 180 + P;
+                                        Y = Y + 45;
+                                        if (Y < -45) Y = -45;
+                                        if (Y > 45) Y = 45;
+                                        break;
+                                    
 
-                                                                   //Textで表示させるためにstring型へ変換
-                                    string RollRotate = R.ToString();
+                                }
+                                // if (R < 0) R = 0 - R;
+                                // if (Y < 0) Y = 0 - Y;
+                                // if (P < 0) P = 0 - P;
+                                //Textで表示させるためにstring型へ変換
+                                string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
+                                int X = (int)Angle(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineBase], body.Joints[JointType.ElbowRight]);
+                                X = X - 75;
+                                string Xing = X.ToString();
                                 flag = n % 3;
                                 if (flag == 1)
                                 {
@@ -369,28 +409,29 @@ namespace KinectSkeletonTracking
                                             break;
                                     }*/
                                     
-                                    switch (joint.Key)          //ロボゼロ対応
+                                   switch (joint.Key)          //ロボゼロ対応
                                     {
-                                        case JointType.SpineMid:
-                                           server1.socket("10:" + YowRotate);
-                                            server1.socket("11:" + PitchRotate);
-                                            break;
-                                        case JointType.ElbowLeft:
+                                        //case JointType.SpineMid:
+                                           //server1.socket("10:" + YowRotate);
+                                           // server1.socket("11:" + PitchRotate);
+                                          //  break;
+                                        /*case JointType.ElbowLeft:
                                             server1.socket("7:" + YowRotate);
                                             server1.socket("8:" + PitchRotate);
                                             break;
                                         case JointType.ShoulderLeft:
                                             server1.socket("6:" + RollRotate);
                                             server1.socket("5:" + PitchRotate);
-                                            break;
+                                            break;*/
                                         case JointType.ShoulderRight:
-                                            server1.socket("3:" + RollRotate);
-                                            server1.socket("4:" + PitchRotate);
+                                          server1.socket("3:" + Xing);
+                                            Debug.WriteLine(Xing);
+                                           // server1.socket("4:" + PitchRotate);
                                             break;
-                                        case JointType.ElbowRight:
-                                            server1.socket("2:" + YowRotate);
-                                            server1.socket("1:" + PitchRotate);
-                                            break;  
+                                        //case JointType.ElbowRight:
+                                          //  server1.socket("2:" + YowRotate);
+                                           // server1.socket("1:" + PitchRotate);
+                                           // break;  
 
                                     }
                                     

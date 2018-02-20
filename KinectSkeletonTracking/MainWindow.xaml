@@ -19,8 +19,8 @@
         <TextBox x:Name="ShourderLeft"  Width="180" Height="20" Margin="779,0,50.6,300.4" />
         <TextBox x:Name="KneeRight" Width="180" Height="20" Margin="51,0,779.1,800.4" />
         <TextBox x:Name="KneeLeft" Width="180" Height="20" Margin="51,0,779.1,700.4" />
-        <TextBox x:Name="FootRight" Width="180" Height="20" Margin="51,0,779.1,600.4" />
-        <TextBox x:Name="FootLeft" Width="180" Height="20" Margin="51,0,779.1,500.4" />
+        <TextBox x:Name="HandRight" Width="180" Height="20" Margin="51,0,779.1,600.4" />
+        <TextBox x:Name="HandLeft" Width="180" Height="20" Margin="51,0,779.1,500.4" />
         <TextBox x:Name="SpinMid" Width="180" Height="20" Margin="51,0,779.1,400.4" />
         <TextBox x:Name="AncleRight" Width="180" Height="20" Margin="51,0,779.1,300.4" />
         <TextBox x:Name="AncleLeft" Width="180" Height="20" Margin="51,0,779.1,200.4" />
