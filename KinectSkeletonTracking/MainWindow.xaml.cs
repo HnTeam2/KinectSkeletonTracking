@@ -236,6 +236,7 @@ namespace KinectSkeletonTracking
                                     //Keyから値を取得
                                     TextBox textBox_num = textBox_joint[Key];
                                     textBox_num.Text = textBox_joint[Key] + "R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
+                                    count++;
                                 }
 
                                 //二人目の角度を表示
@@ -243,10 +244,11 @@ namespace KinectSkeletonTracking
                                 {
                                     TextBox textBox_num2 = textBox_joint2[Key];
                                     textBox_num2.Text = textBox_joint2[Key]+"R" + " " + RollRotate + " " + "Y" + " " + YowRotate + " " + "P" + " " + PitchRotate;
+                                    count--;
                                 }
 
 
-                                count++;
+                                
                                 // TODO:↑の角度の値から必要なものをソケット通信で送信する
                                 Debug.WriteLine(((int)rollRotate).ToString());
                             }
