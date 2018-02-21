@@ -245,14 +245,10 @@ namespace KinectSkeletonTracking
                             }
 
                         }
-
-                            Dispatcher.Invoke(new Action(() =>
-                            {
                                 if (joint.Value.TrackingState == TrackingState.Inferred)
                                 {
                                     DrawEllipse(joint.Value, 10, Brushes.Yellow);
                                 }
-                            }));
                     }
                 }
             }
