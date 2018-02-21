@@ -81,10 +81,7 @@ namespace KinectSkeletonTracking
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            var task1 = Task.Run(() =>
-            {
-                SendRotate();
-            });
+            SendRotate();
           //  SendRotate();    // 角度を取得して送信する
             
         }
@@ -112,8 +109,6 @@ namespace KinectSkeletonTracking
 
         private void DrawEllipse(Joint joint, int R, Brush brush)
         {
-            Dispatcher.Invoke(new Action(() =>
-            {
                 var ellipse = new Ellipse()
                 {
                     // X,Y,Z軸（三次元）をX,Y軸（二次元）に変換
@@ -134,19 +129,14 @@ namespace KinectSkeletonTracking
                 Canvas.SetTop(ellipse, point.Y - (R / 2));
 
                 CanvasBody.Children.Add(ellipse);
-            }));
         }
 
         
 
 
         private void SendRotate()
-        {
-            
-            Dispatcher.Invoke(new Action(() =>
-            {
-                CanvasBody.Children.Clear();
-            }));
+        {    
+            CanvasBody.Children.Clear();
 
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -248,14 +238,10 @@ namespace KinectSkeletonTracking
                             }
 
                         }
-
-                            Dispatcher.Invoke(new Action(() =>
-                            {
                                 if (joint.Value.TrackingState == TrackingState.Inferred)
                                 {
                                     DrawEllipse(joint.Value, 10, Brushes.Yellow);
                                 }
-                            }));
                     }
                 }
             }
