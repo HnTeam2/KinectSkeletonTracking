@@ -112,26 +112,29 @@ namespace KinectSkeletonTracking
 
         private void DrawEllipse(Joint joint, int R, Brush brush)
         {
-            var ellipse = new Ellipse()
+            Dispatcher.Invoke(new Action(() =>
             {
-                // X,Y,Z軸（三次元）をX,Y軸（二次元）に変換
-                Width = R,
-                Height = R,
-                Fill = brush,
-            };
+                var ellipse = new Ellipse()
+                {
+                    // X,Y,Z軸（三次元）をX,Y軸（二次元）に変換
+                    Width = R,
+                    Height = R,
+                    Fill = brush,
+                };
 
-            // カメラからDepth座標へ変換
-            var point = kinect.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
-            if ((point.X < 0) || (point.Y < 0))
-            {
-                return;
-            }
+                // カメラからDepth座標へ変換
+                var point = kinect.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+                if ((point.X < 0) || (point.Y < 0))
+                {
+                    return;
+                }
 
-            // 関節を円で描画
-            Canvas.SetLeft(ellipse, point.X - (R / 2));
-            Canvas.SetTop(ellipse, point.Y - (R / 2));
+                // 関節を円で描画
+                Canvas.SetLeft(ellipse, point.X - (R / 2));
+                Canvas.SetTop(ellipse, point.Y - (R / 2));
 
-            CanvasBody.Children.Add(ellipse);
+                CanvasBody.Children.Add(ellipse);
+            }));
         }
 
         
@@ -245,10 +248,14 @@ namespace KinectSkeletonTracking
                             }
 
                         }
+
+                            Dispatcher.Invoke(new Action(() =>
+                            {
                                 if (joint.Value.TrackingState == TrackingState.Inferred)
                                 {
                                     DrawEllipse(joint.Value, 10, Brushes.Yellow);
                                 }
+                            }));
                     }
                 }
             }
