@@ -84,6 +84,7 @@ namespace KinectSkeletonTracking
     {
         KinectSensor kinect;
         int flag = 0,n=0;
+        int ER1=163, ER2=130, SR3=125, SR4=162, SL5=168, SL6=119, EL7=139, EL8=168, SM11=177;
         public const int Port = 55555;
         public const int Port2 = 9999;
         BodyFrameReader bodyFrameReader; //
@@ -249,39 +250,72 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
-        public static double Angle(Joint cen , Joint first, Joint second)
+        public static double XY(Joint cen , Joint first, Joint second)
         {
-            const double M_PI = 3.1415926535897;
+            const double PI = 3.1415926535897;
 
-            double ma_x = first.Position.X - cen.Position.X;
-            double ma_y = first.Position.Y - cen.Position.Y;
-            double mb_x = second.Position.X - cen.Position.X;
-            double mb_y = second.Position.Y - cen.Position.Y;
-            double v1 = (ma_x * mb_x) + (ma_y * mb_y);
-            double ma_val = Math.Sqrt(ma_x * ma_x + ma_y * ma_y);
-            double mb_val = Math.Sqrt(mb_x * mb_x + mb_y * mb_y);
-            double cosM = v1 / (ma_val * mb_val);
-            double angleAMB = Math.Acos(cosM) * 180 / M_PI;
+            double maX = first.Position.X - cen.Position.X;
+            double maY = first.Position.Y - cen.Position.Y;
+            double mbX = second.Position.X - cen.Position.X;
+            double mbY = second.Position.Y - cen.Position.Y;
+            double v1 = (maX * mbX) + (maY * mbY);
+            double maVal = Math.Sqrt(maX * maX + maY * maY);
+            double mbVal = Math.Sqrt(mbX * mbX + mbY * mbY);
+            double cosM = v1 / (maVal * mbVal);
+            double angleAMB = Math.Acos(cosM) * 180 / PI;
 
             return angleAMB;
         }
         public static double XZ(Joint cen, Joint first, Joint second)
         {
-            const double M_PI = 3.1415926535897;
+            const double PI = 3.1415926535897;
 
-            double ma_x = first.Position.X - cen.Position.X;
-            double ma_y = first.Position.Z - cen.Position.Z;
-            double mb_x = second.Position.X - cen.Position.X;
-            double mb_y = second.Position.Z - cen.Position.Z;
-            double v1 = (ma_x * mb_x) + (ma_y * mb_y);
-            double ma_val = Math.Sqrt(ma_x * ma_x + ma_y * ma_y);
-            double mb_val = Math.Sqrt(mb_x * mb_x + mb_y * mb_y);
-            double cosM = v1 / (ma_val * mb_val);
-            double angleAMB = Math.Acos(cosM) * 180 / M_PI;
+            double maZ = first.Position.Z - cen.Position.Z;
+            double maX = first.Position.X - cen.Position.X;
+            double mbZ = second.Position.Z - cen.Position.Z;
+            double mbX = second.Position.X - cen.Position.X;
+            double v1 = (maZ * mbZ) + (maX * mbX);
+            double maVal = Math.Sqrt(maZ * maZ + maX * maX);
+            double mbVal = Math.Sqrt(mbZ * mbZ + mbX * mbX);
+            double cosM = v1 / (maVal * mbVal);
+            double angleAMB = Math.Acos(cosM) * 180 / PI;
 
             return angleAMB;
         }
+        public static double YZ(Joint cen, Joint first, Joint second)
+        {
+            const double PI = 3.1415926535897;
 
+            double maZ = first.Position.Z - cen.Position.Z;
+            double maY = first.Position.Y - cen.Position.Y;
+            double mbZ = second.Position.Z - cen.Position.Z;
+            double mbY = second.Position.Y - cen.Position.Y;
+            double v1 = (maZ * mbZ) + (maY * mbY);
+            double maVal = Math.Sqrt(maZ * maZ + maY * maY);
+            double mbVal = Math.Sqrt(mbZ * mbZ + mbY * mbY);
+            double cosM = v1 / (maVal * mbVal);
+            double angleAMB = Math.Acos(cosM) * 180 / PI;
+
+            return angleAMB;
+        }
+         public static double XYZ(Joint cen , Joint first, Joint second)
+        {
+            const double PI = 3.1415926535897;
+
+            double maX = first.Position.X - cen.Position.X;
+            double maY = first.Position.Y - cen.Position.Y;
+            double mbX = second.Position.X - cen.Position.X;
+            double mbY = second.Position.Y - cen.Position.Y;
+            double maZ= first.Position.Z - cen.Position.Z;
+            double mbZ= second.Position.Z - cen.Position.Z;
+            double v1 = (maX * mbX) + (maY * mbY)+(maZ*mbZ);
+            double maVal = Math.Sqrt(maX * maX + maY * maY+maZ*maZ);
+            double mbVal = Math.Sqrt(mbX * mbX + mbY * mbY+mbZ*mbZ);
+            double cosM = v1 / (maVal * mbVal);
+            double angleAMB = Math.Acos(cosM) * 180 / PI;
+
+            return angleAMB;
+        }
         private void SendRotate()
         {
             
@@ -345,40 +379,14 @@ namespace KinectSkeletonTracking
                                 int R = (int)rollRotate;
                                 int Y = (int)yowRotate;
                                 int P = (int)pitchRotate;
-                                switch (joint.Key)          //ロボゼロ対応
-                                {
-                                    case JointType.SpineMid:
-                                        if (Y < -45) Y = -45;
-                                        if (Y >45) Y = 45;
-                                        if (P > 0) P = 0 - P;
-                                        P = P + 130;
-                                        if (P > 45) P = 45;
-                                        if (P < -45) P = -45;
-                                        break;
-                                    case JointType.ElbowRight:
-                                        if (P > 0) P = 0 - P;
-                                        P = 180 + P;
-                                        Y = Y + 45;
-                                        if (Y < -45) Y = -45;
-                                        if (Y > 45) Y = 45;
-                                        break;
-                                    
-
-                                }
-                                // if (R < 0) R = 0 - R;
-                                // if (Y < 0) Y = 0 - Y;
-                                // if (P < 0) P = 0 - P;
+                                
                                 //Textで表示させるためにstring型へ変換
                                 string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
-                                int X = (int)Angle(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineBase], body.Joints[JointType.ElbowRight]);
-                                int Z = (int)XZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineBase], body.Joints[JointType.ElbowRight]);
-                                X = X - 75;
-                                Z = 107 - Z;
-                                if (Z > 0) Z=Z * 2;
-                                string Xing = X.ToString();
-                                string Zing = Z.ToString();
+                                
+                                
+                                
                                 flag = n % 3;
                                 if (flag == 1)
                                 {
@@ -428,33 +436,98 @@ namespace KinectSkeletonTracking
                                             server2.socket("16:" + RollRotate);
                                             break;
                                     }*/
-                                    
-                                   switch (joint.Key)          //ロボゼロ対応
-                                    {
-                                        //case JointType.SpineMid:
-                                           //server1.socket("10:" + YowRotate);
-                                           // server1.socket("11:" + PitchRotate);
-                                          //  break;
-                                        /*case JointType.ElbowLeft:
-                                            server1.socket("7:" + YowRotate);
-                                            server1.socket("8:" + PitchRotate);
-                                            break;
-                                        case JointType.ShoulderLeft:
-                                            server1.socket("6:" + RollRotate);
-                                            server1.socket("5:" + PitchRotate);
-                                            break;*/
-                                        case JointType.ShoulderRight:
-                                          server1.socket("3:" + Xing);
-                                            
-                                           server1.socket("4:" + Zing);
-                                            break;
-                                        //case JointType.ElbowRight:
-                                          //  server1.socket("2:" + YowRotate);
-                                           // server1.socket("1:" + PitchRotate);
-                                           // break;  
 
-                                    }
-                                    
+                                    /*switch (joint.Key)          //ロボゼロ対応
+                                     {
+                                         case JointType.SpineMid:
+                                              SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+                                             //Debug.WriteLine("SM11:" + SM11);
+                                             //server1.socket("10:" + YowRotate);
+                                             //server1.socket("11:" + PitchRotate);
+                                             break;
+                                         case JointType.ElbowLeft:
+                                              EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
+                                    EL8 = 120 - EL8;
+                                    string el8 = EL8.ToString();
+                                    server1.socket("8:" + el8);
+                                             break;
+                                         case JointType.ShoulderLeft:
+                                            SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                                    SL6 = 160 - SL6;
+                                    string sl6 = SL6.ToString();
+                                    server1.socket("6:" + sl6);
+                                             break;
+                                         case JointType.ShoulderRight:
+                                              SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                             SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                             SR3 = SR3 - 160;
+                                             // SR4 = (SR4 - 157) * 2;
+                                             string sr3 = SR3.ToString();
+                                             //string sr4 = SR4.ToString();
+                                             //Debug.WriteLine("SR3:" + SR3);
+                                             // Debug.WriteLine("SR4:" + SR4);
+                                             //SR3 = SR3 - 75;
+                                             // SR4 = 107 - SR4;
+                                             //if (SR4 > 10) SR4 = SR4 * 3;
+                                             //server1.socket("3:" + SR3);
+                                             // server1.socket("4:" + SR4);
+                                             break;
+                                             case JointType.ElbowRight:
+                                               ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+                                            ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
+                                            ER1 = ER1 - 120;
+                                            ER2 = ER2 - 130;
+                                            string er1 = ER1.ToString();
+                                            //string er2 = ER2.ToString();
+                                            //Debug.WriteLine("ER1:" + ER1);
+                                            //Debug.WriteLine("ER2:" + ER2);
+                                            //server1.socket("2:" + er2);
+                                           // server1.socket("1:" + er1);
+                                             break;  
+
+                                     }*/
+
+
+
+                                    SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                            SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                            SR3 = SR3 - 160;
+                                            // SR4 = (SR4 - 157) * 2;
+                                            string sr3 = SR3.ToString();
+                                            //string sr4 = SR4.ToString();
+                                            //Debug.WriteLine("SR3:" + SR3);
+                                            // Debug.WriteLine("SR4:" + SR4);
+                                            //SR3 = SR3 - 75;
+                                            // SR4 = 107 - SR4;
+                                            //if (SR4 > 10) SR4 = SR4 * 3;
+                                            //server1.socket("3:" + SR3);
+                                            // server1.socket("4:" + SR4);
+                                            
+                                        
+                                            ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+                                            ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
+                                            ER1 = ER1 - 120;
+                                            ER2 = ER2 - 130;
+                                            string er1 = ER1.ToString();
+                                            //string er2 = ER2.ToString();
+                                            //Debug.WriteLine("ER1:" + ER1);
+                                            //Debug.WriteLine("ER2:" + ER2);
+                                            //server1.socket("2:" + er2);
+                                           // server1.socket("1:" + er1);
+
+
+                                    //SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                                    //Debug.WriteLine("SL6:" + SL6);
+                                    //Debug.WriteLine("SL5:" + SL5);
+                                    SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                                    SL6 = 160 - SL6;
+                                    string sl6 = SL6.ToString();
+                                    server1.socket("6:" + sl6);
+                                    EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
+                                    EL8 = 120 - EL8;
+                                    string el8 = EL8.ToString();
+                                    server1.socket("8:" + el8);
+
                                 }
 
                                 //DictionaryのKeyで値と一致
