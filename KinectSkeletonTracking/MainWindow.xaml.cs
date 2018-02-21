@@ -140,7 +140,10 @@ namespace KinectSkeletonTracking
 
         private void SendRotate()
         {
-            CanvasBody.Children.Clear();
+            var task1 = Task.Run(() =>
+            {
+                CanvasBody.Children.Clear();
+            });
 
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -243,11 +246,13 @@ namespace KinectSkeletonTracking
 
                         }
 
-
-                        if (joint.Value.TrackingState == TrackingState.Inferred)
+                        var task2 = Task.Run(() =>
                         {
-                            DrawEllipse(joint.Value, 10, Brushes.Yellow);
-                        }
+                            if (joint.Value.TrackingState == TrackingState.Inferred)
+                            {
+                                DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                            }
+                        });
                     }
                 }
             }
