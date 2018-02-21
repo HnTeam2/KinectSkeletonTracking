@@ -27,7 +27,6 @@ namespace KinectSkeletonTracking
 
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-        Body[] bodies2; // 二人目のBodyを保持する配列
 
 
         public MainWindow()
@@ -140,10 +139,11 @@ namespace KinectSkeletonTracking
 
         private void SendRotate()
         {
-            var task1 = Task.Run(() =>
+            
+            Dispatcher.Invoke(new Action(() =>
             {
                 CanvasBody.Children.Clear();
-            });
+            }));
 
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
@@ -246,13 +246,13 @@ namespace KinectSkeletonTracking
 
                         }
 
-                        var task2 = Task.Run(() =>
-                        {
-                            if (joint.Value.TrackingState == TrackingState.Inferred)
+                            Dispatcher.Invoke(new Action(() =>
                             {
-                                DrawEllipse(joint.Value, 10, Brushes.Yellow);
-                            }
-                        });
+                                if (joint.Value.TrackingState == TrackingState.Inferred)
+                                {
+                                    DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                                }
+                            }));
                     }
                 }
             }
