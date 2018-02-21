@@ -439,12 +439,12 @@ namespace KinectSkeletonTracking
 
                                     /*switch (joint.Key)          //ロボゼロ対応
                                      {
-                                         case JointType.SpineMid:
-                                              SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+                                        // case JointType.SpineMid:
+                                              //SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
                                              //Debug.WriteLine("SM11:" + SM11);
                                              //server1.socket("10:" + YowRotate);
                                              //server1.socket("11:" + PitchRotate);
-                                             break;
+                                             //break;
                                          case JointType.ElbowLeft:
                                               EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
                                     EL8 = 120 - EL8;
@@ -463,15 +463,16 @@ namespace KinectSkeletonTracking
                                              SR3 = SR3 - 160;
                                              // SR4 = (SR4 - 157) * 2;
                                              string sr3 = SR3.ToString();
-                                             //string sr4 = SR4.ToString();
-                                             //Debug.WriteLine("SR3:" + SR3);
-                                             // Debug.WriteLine("SR4:" + SR4);
-                                             //SR3 = SR3 - 75;
-                                             // SR4 = 107 - SR4;
-                                             //if (SR4 > 10) SR4 = SR4 * 3;
-                                             //server1.socket("3:" + SR3);
-                                             // server1.socket("4:" + SR4);
-                                             break;
+                                            server1.socket("3:" + sr3);
+                                            //string sr4 = SR4.ToString();
+                                            //Debug.WriteLine("SR3:" + SR3);
+                                            // Debug.WriteLine("SR4:" + SR4);
+                                            //SR3 = SR3 - 75;
+                                            // SR4 = 107 - SR4;
+                                            //if (SR4 > 10) SR4 = SR4 * 3;
+                                            //server1.socket("3:" + SR3);
+                                            // server1.socket("4:" + SR4);
+                                            break;
                                              case JointType.ElbowRight:
                                                ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
                                             ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
@@ -482,29 +483,31 @@ namespace KinectSkeletonTracking
                                             //Debug.WriteLine("ER1:" + ER1);
                                             //Debug.WriteLine("ER2:" + ER2);
                                             //server1.socket("2:" + er2);
-                                           // server1.socket("1:" + er1);
+                                            server1.socket("1:" + er1);
                                              break;  
 
                                      }*/
 
 
 
-                                    SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                            SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
                                             SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
                                             SR3 = SR3 - 160;
-                                            // SR4 = (SR4 - 157) * 2;
-                                            string sr3 = SR3.ToString();
-                                            //string sr4 = SR4.ToString();
+                                            SR4 = SR4-150;
+                                            if (SR4 > 0) SR4 = SR4 * 2;
+                                            //string sr3 = SR3.ToString();
+                                            //server1.socket("3:" + sr3);
+                                            string sr4 = SR4.ToString();
+                                            server1.socket("4:" + sr4);
                                             //Debug.WriteLine("SR3:" + SR3);
                                             // Debug.WriteLine("SR4:" + SR4);
-                                            //SR3 = SR3 - 75;
-                                            // SR4 = 107 - SR4;
-                                            //if (SR4 > 10) SR4 = SR4 * 3;
-                                            //server1.socket("3:" + SR3);
-                                            // server1.socket("4:" + SR4);
+                                             //SR3 = SR3 - 75;
+                                             // SR4 = 107 - SR4;
+                                             //if (SR4 > 10) SR4 = SR4 * 3;
                                             
-                                        
-                                            ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+
+
+                                    ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
                                             ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
                                             ER1 = ER1 - 120;
                                             ER2 = ER2 - 130;
@@ -513,20 +516,24 @@ namespace KinectSkeletonTracking
                                             //Debug.WriteLine("ER1:" + ER1);
                                             //Debug.WriteLine("ER2:" + ER2);
                                             //server1.socket("2:" + er2);
-                                           // server1.socket("1:" + er1);
+                                            //server1.socket("1:" + er1);
 
 
-                                    //SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                                    SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
                                     //Debug.WriteLine("SL6:" + SL6);
                                     //Debug.WriteLine("SL5:" + SL5);
+                                    SL5 = 140 - SL5;
+                                    if (SL5 < 0) SL5 = SL5 * 2;
+                                    string sl5 = SL5.ToString();
                                     SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
                                     SL6 = 160 - SL6;
                                     string sl6 = SL6.ToString();
-                                    server1.socket("6:" + sl6);
+                                   // server1.socket("5:" + sl5);
+                                    // server1.socket("6:" + sl6);
                                     EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
                                     EL8 = 120 - EL8;
                                     string el8 = EL8.ToString();
-                                    server1.socket("8:" + el8);
+                                    //server1.socket("8:" + el8);
 
                                 }
 
