@@ -17,6 +17,7 @@ using Microsoft.Kinect;
 
 namespace KinectSkeletonTracking
 {
+    //test
     class Conection
     {
         public const string IpString = "192.168.43.181"; //PCのIPアドレスにする
