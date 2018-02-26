@@ -203,7 +203,7 @@ namespace KinectSkeletonTracking
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            await Task.Run(()=>SendRotate());    // 角度を取得して送信する
+            await Task.Run(()=>SendRotate());    // 角度を取得して送信する(非同期）
         }
 
 
