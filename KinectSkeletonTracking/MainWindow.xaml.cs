@@ -199,11 +199,11 @@ namespace KinectSkeletonTracking
         }
 
         // イベント発生はこのメソッドに通知される？
-        void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
+        async void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            SendRotate();    // 角度を取得して送信する
+            await Task.Run(()=>SendRotate());    // 角度を取得して送信する
         }
 
 
@@ -317,7 +317,8 @@ namespace KinectSkeletonTracking
 
             return angleAMB;
         }
-        private void SendRotate()
+    
+        private  void SendRotate()
         {
             
             CanvasBody.Children.Clear();
