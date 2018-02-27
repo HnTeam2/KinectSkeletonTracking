@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -85,12 +83,12 @@ namespace KinectSkeletonTracking
     {
         KinectSensor kinect;
         int flag = 0,n=0;
-        int ER1, ER2, SR3, SR4, SL5, SL6, EL7, EL8,SM10, SM11;
+        int ER1 = 163, ER2 = 130, SR3 = 125, SR4 = 162, SL5 = 168, SL6 = 119, EL7 = 139, EL8 = 168, SM11 = 177,SM10;
         public const int Port = 55555;
         public const int Port2 = 9999;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-       Conection server1 = new Conection(Port);
+       //Conection server1 = new Conection(Port);
         //Conection server2 = new Conection(Port2);
         public MainWindow()
         {
@@ -240,6 +238,13 @@ namespace KinectSkeletonTracking
 
             return angleAMB;
         }
+        public static double Cop(Joint first, Joint second)
+        {
+            int flag = 0;
+            if (first.Position.Z > second.Position.Z) { flag = 1; }
+            return flag;
+
+        }
          public static double XYZ(Joint cen , Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
@@ -302,7 +307,7 @@ namespace KinectSkeletonTracking
                             {JointType.AnkleLeft,AncleLeft}
                         };
 
-
+                       
 
                         //foreachでJointTypeを網羅
                         foreach (var jointType in useJointType)
@@ -432,85 +437,59 @@ namespace KinectSkeletonTracking
 
 
 
-                                            SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                            SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineMid], body.Joints[JointType.ElbowRight]);
                                             SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
-                                            SR3 = SR3 - 160;
-                                            SR4 = SR4-158;
+                                            SR3 = (SR3 - 98)/6;
+                                            SR4 = (SR4-128)/6;
+                                    SR3 = SR3 * 6;
+                                    SR4 = SR4 * 6;
                                             if (SR4 > 0) SR4 = SR4 * 2;
                                             string sr3 = SR3.ToString();
                                             string sr4 = SR4.ToString();
                                             ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
                                             //ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
-                                            ER1 = ER1 - 120;
+                                            ER1 = (ER1 - 120)/6;
+                                    ER1 = ER1 * 6;
                                            // ER2 = ER2 - 130;
                                             string er1 = ER1.ToString();
-                                           // string er2 = ER2.ToString();
+　                                           // string er2 = ER2.ToString();
                                             SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
-                                            SL5 = 159 - SL5;
-                                            if (SL5 < 0) SL5 = SL5 * 2;
+                                            SL5 = (SL5-173)/6;
+                                    SL5 = SL5 * 6;
+                                            if (SL5 >0) SL5 = SL5 * 2;
                                             string sl5 = SL5.ToString();
                                             SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
                                             SL6 = 160 - SL6;
+                                    SL6 = SL6 / 6;
+                                    SL6 = SL6 * 6;
                                             string sl6 = SL6.ToString();
                                              EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
-                                            EL8 = 120 - EL8;
+                                            EL8 = (120 - EL8)/6;
+                                    EL8 = EL8 * 6;
                                             string el8 = EL8.ToString();
-                                            SM11 = (int)XYZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+                                            SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
                                             SM10 = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
-                                            SM11 = SM11 - 225;
-                                            SM10 = SM10 - 175;
+                                            SM11 = (SM11 - 225)/6;
+                                            SM11 = SM11 * 6;
+                                    int flag = (int)Cop(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ShoulderLeft]);
+                                            SM10 = (SM10 - 169)/6;
+                                            SM10 = SM10 * 6;
+                                    if (flag == 0) { SM10 = 0 - SM10; }
                                             string sm11 = SM11.ToString();
                                             string sm10 = SM10.ToString();
-                                            
-                            var task1 = new Task(() =>
-                                    {
-                                        server1.socket("1:" + er1);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task2 = new Task(() =>
-                                    {
-                                        server1.socket("3:" + sr3);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task3 = new Task(() =>
-                                    {
-                                        server1.socket("4:" + sr4);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task4 = new Task(() =>
-                                    {
-                                        server1.socket("5:" + sl5);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task5 = new Task(() =>
-                                    {
-                                        server1.socket("6:" + sl6);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task6 = new Task(() =>
-                                    {
-                                        server1.socket("8:" + el8);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task7 = new Task(() =>
-                                    {
-                                        server1.socket("10:" + sm10);
-                                        Thread.Sleep(100);
-                                    });
-                                    var task8 = new Task(() =>
-                                    {
-                                        server1.socket("11:" + sm11);
-                                        Thread.Sleep(100);
-                                    });
-                                    task1.Start();
-                                    task2.Start();
-                                    task3.Start();
-                                    task4.Start();
-                                    task5.Start();
-                                    task6.Start();
-                                    task7.Start();
-                                    task8.Start();
-                                    
+                                    //server1.socket("1:" + er1);
+                                    //server1.socket("3:" + sr3);
+                                    // server1.socket("4:" + sr4);
+                                    //server1.socket("5:" + sl5);
+                                    // server1.socket("6:" + sl6);
+                                    // server1.socket("8:" + el8);
+                                    //server1.socket("10:" + sm10);
+                                    //server1.socket("11:" + sm11);
+
+                                    Debug.WriteLine("10:" + sm10);
+                                    //Debug.WriteLine("5:" + sl5);
+                                  
+
                                 }
 
                                 //DictionaryのKeyで値と一致
