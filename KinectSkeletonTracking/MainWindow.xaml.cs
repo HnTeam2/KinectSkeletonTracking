@@ -90,7 +90,7 @@ namespace KinectSkeletonTracking
         public const int Port2 = 9999;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-       Conection server1 = new Conection(Port);
+        Conection server1 = new Conection(Port);
         //Conection server2 = new Conection(Port2);
         public MainWindow()
         {
@@ -199,11 +199,11 @@ namespace KinectSkeletonTracking
         }
 
         // イベント発生はこのメソッドに通知される？
-        async void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
+        void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
-            await Task.Run(()=>SendRotate());    // 角度を取得して送信する(非同期）
+            SendRotate();    // 角度を取得して送信する(非同期）
         }
 
 
@@ -251,10 +251,12 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
-        public static double XY(Joint cen , Joint first, Joint second)
+         public static async Task<int> XY(Joint cen , Joint first, Joint second)
         {
-            const double PI = 3.1415926535897;
-
+            const double
+                PI = 3.1415926535897;
+            
+            double XY_data= await Task.Run(()=>{
             double maX = first.Position.X - cen.Position.X;
             double maY = first.Position.Y - cen.Position.Y;
             double mbX = second.Position.X - cen.Position.X;
@@ -264,58 +266,72 @@ namespace KinectSkeletonTracking
             double mbVal = Math.Sqrt(mbX * mbX + mbY * mbY);
             double cosM = v1 / (maVal * mbVal);
             double angleAMB = Math.Acos(cosM) * 180 / PI;
-
             return angleAMB;
+            }); 
+
+            return (int)XY_data;
+            
         }
-        public static double XZ(Joint cen, Joint first, Joint second)
+        public  static async Task<double> XZ(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
-            double maZ = first.Position.Z - cen.Position.Z;
-            double maX = first.Position.X - cen.Position.X;
-            double mbZ = second.Position.Z - cen.Position.Z;
-            double mbX = second.Position.X - cen.Position.X;
-            double v1 = (maZ * mbZ) + (maX * mbX);
-            double maVal = Math.Sqrt(maZ * maZ + maX * maX);
-            double mbVal = Math.Sqrt(mbZ * mbZ + mbX * mbX);
-            double cosM = v1 / (maVal * mbVal);
-            double angleAMB = Math.Acos(cosM) * 180 / PI;
+            double XZ_data = await Task.Run(() =>
+            {
+                double maZ = first.Position.Z - cen.Position.Z;
+                double maX = first.Position.X - cen.Position.X;
+                double mbZ = second.Position.Z - cen.Position.Z;
+                double mbX = second.Position.X - cen.Position.X;
+                double v1 = (maZ * mbZ) + (maX * mbX);
+                double maVal = Math.Sqrt(maZ * maZ + maX * maX);
+                double mbVal = Math.Sqrt(mbZ * mbZ + mbX * mbX);
+                double cosM = v1 / (maVal * mbVal);
+                double angleAMB = Math.Acos(cosM) * 180 / PI;
+                return angleAMB;
+            });
 
-            return angleAMB;
+            return XZ_data;
         }
-        public static double YZ(Joint cen, Joint first, Joint second)
+        public static async Task<double> YZ(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
-            double maZ = first.Position.Z - cen.Position.Z;
-            double maY = first.Position.Y - cen.Position.Y;
-            double mbZ = second.Position.Z - cen.Position.Z;
-            double mbY = second.Position.Y - cen.Position.Y;
-            double v1 = (maZ * mbZ) + (maY * mbY);
-            double maVal = Math.Sqrt(maZ * maZ + maY * maY);
-            double mbVal = Math.Sqrt(mbZ * mbZ + mbY * mbY);
-            double cosM = v1 / (maVal * mbVal);
-            double angleAMB = Math.Acos(cosM) * 180 / PI;
+            double YZ_data = await Task.Run(() =>
+            {
+                double maZ = first.Position.Z - cen.Position.Z;
+                double maY = first.Position.Y - cen.Position.Y;
+                double mbZ = second.Position.Z - cen.Position.Z;
+                double mbY = second.Position.Y - cen.Position.Y;
+                double v1 = (maZ * mbZ) + (maY * mbY);
+                double maVal = Math.Sqrt(maZ * maZ + maY * maY);
+                double mbVal = Math.Sqrt(mbZ * mbZ + mbY * mbY);
+                double cosM = v1 / (maVal * mbVal);
+                double angleAMB = Math.Acos(cosM) * 180 / PI;
+                return angleAMB;
+            });
 
-            return angleAMB;
+            return YZ_data;
         }
-         public static double XYZ(Joint cen , Joint first, Joint second)
+         public static async Task<double> XYZ(Joint cen , Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
-            double maX = first.Position.X - cen.Position.X;
-            double maY = first.Position.Y - cen.Position.Y;
-            double mbX = second.Position.X - cen.Position.X;
-            double mbY = second.Position.Y - cen.Position.Y;
-            double maZ= first.Position.Z - cen.Position.Z;
-            double mbZ= second.Position.Z - cen.Position.Z;
-            double v1 = (maX * mbX) + (maY * mbY)+(maZ*mbZ);
-            double maVal = Math.Sqrt(maX * maX + maY * maY+maZ*maZ);
-            double mbVal = Math.Sqrt(mbX * mbX + mbY * mbY+mbZ*mbZ);
-            double cosM = v1 / (maVal * mbVal);
-            double angleAMB = Math.Acos(cosM) * 180 / PI;
-
-            return angleAMB;
+            double XYZ_data = await Task.Run(() =>
+            {
+                double maX = first.Position.X - cen.Position.X;
+                double maY = first.Position.Y - cen.Position.Y;
+                double mbX = second.Position.X - cen.Position.X;
+                double mbY = second.Position.Y - cen.Position.Y;
+                double maZ = first.Position.Z - cen.Position.Z;
+                double mbZ = second.Position.Z - cen.Position.Z;
+                double v1 = (maX * mbX) + (maY * mbY) + (maZ * mbZ);
+                double maVal = Math.Sqrt(maX * maX + maY * maY + maZ * maZ);
+                double mbVal = Math.Sqrt(mbX * mbX + mbY * mbY + mbZ * mbZ);
+                double cosM = v1 / (maVal * mbVal);
+                double angleAMB = Math.Acos(cosM) * 180 / PI;
+                return angleAMB;
+            });
+            return XYZ_data;
         }
     
         private  void SendRotate()
@@ -491,7 +507,7 @@ namespace KinectSkeletonTracking
 
 
 
-                                    SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                                     SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
                                             SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
                                             SR3 = SR3 - 160;
                                             // SR4 = (SR4 - 157) * 2;
