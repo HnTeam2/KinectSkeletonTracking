@@ -27,9 +27,15 @@ namespace KinectSkeletonTracking
         private byte[] RzFootL = {5, 11, 0, 0};
 
         private float SpainBaseZ = 0, SpainBaseY = 0;
+        private Connection server;
+
+        private RoboZero(Connection server)
+        {
+            this.server = server;
+        }
 
         //ロボゼロのbyte型送信
-        private void robozeroByte(Body body, Connection server)
+        private void robozeroByte(Body body)
         {
             // --------------------------------- 下半身 ---------------------------------
 

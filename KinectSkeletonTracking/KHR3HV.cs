@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Channels;
 using Microsoft.Kinect;
 using static KinectSkeletonTracking.CalcRotate;
 using static Microsoft.Kinect.JointType;
@@ -26,9 +27,15 @@ namespace KinectSkeletonTracking
         byte[] KHRFootL = {0, 16, 0, 0};
 
         private float SpainBaseZ = 0, SpainBaseY = 0;
+        private Connection server;
+
+        public KHR3HV(Connection server)
+        {
+            this.server = server;
+        }
 
         //KHRのbyte型送信
-        private void KHRByte(Body body, Connection server)
+        private void KHRByte(Body body)
         {
             // --------------------------------- 下半身 ---------------------------------
 
@@ -71,7 +78,7 @@ namespace KinectSkeletonTracking
                 KHRShoulderRPitch[2] = SplitRotate[0];
                 KHRShoulderRPitch[3] = SplitRotate[1];
                 server.sendBytes(KHRShoulderRPitch);
-                
+
                 var rotateElbowRight = (int) CalcXYZ(body.Joints[ElbowRight], body.Joints[HandRight],
                     body.Joints[ShoulderRight]);
                 rotateElbowRight -= 120;
@@ -106,7 +113,7 @@ namespace KinectSkeletonTracking
                 KHRElbowL[2] = SplitRotate[0];
                 KHRElbowL[3] = SplitRotate[1];
                 server.sendBytes(KHRElbowL);
-                
+
                 var rotateSpainMidY = (int) CalcXz(body.Joints[SpineMid], body.Joints[ShoulderLeft],
                     body.Joints[ShoulderRight]);
                 rotateSpainMidY -= 169;
@@ -114,11 +121,11 @@ namespace KinectSkeletonTracking
                 {
                     rotateSpainMidY = 0 - rotateSpainMidY;
                 }
+
                 SplitRotate = BitConverter.GetBytes((Int16) rotateSpainMidY);
                 KHRSpineM[2] = SplitRotate[0];
                 KHRSpineM[3] = SplitRotate[1];
-                server.sendBytes(KHRSpineM);    
-                
+                server.sendBytes(KHRSpineM);
             }
         }
     }

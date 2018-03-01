@@ -6,7 +6,7 @@ using System.Text;
 
 namespace KinectSkeletonTracking
 {
-   class Connection
+   public class Connection
     {
         public const string IpString = "192.168.43.181"; //PCのIPアドレスにする
         private IPAddress ipAdd;

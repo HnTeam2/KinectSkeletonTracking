@@ -104,7 +104,7 @@ namespace KinectSkeletonTracking
             server1 = new Connection(Port1);
             server2 = new Connection(Port2);
 
-            khr3Hv = new KHR3HV();
+            khr3Hv = new KHR3HV(server1);
             roboZero = new RoboZero();
         }
 
