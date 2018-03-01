@@ -29,7 +29,7 @@ namespace KinectSkeletonTracking
         private float SpainBaseZ = 0, SpainBaseY = 0;
         private Connection server;
 
-        private RoboZero(Connection server)
+        public RoboZero(Connection server)
         {
             this.server = server;
         }

@@ -105,7 +105,7 @@ namespace KinectSkeletonTracking
             server2 = new Connection(Port2);
 
             khr3Hv = new KHR3HV(server1);
-            roboZero = new RoboZero();
+            roboZero = new RoboZero(server2);
         }
 
         // Windowが表示されたときコールされる
