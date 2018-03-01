@@ -195,7 +195,7 @@ namespace KinectSkeletonTracking
             CanvasBody.Children.Add(ellipse);
         }
 
-        public static double XY(Joint cen, Joint first, Joint second)
+        private static double XY(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
@@ -211,7 +211,7 @@ namespace KinectSkeletonTracking
             return angleAMB;
         }
 
-        public static double XZ(Joint cen, Joint first, Joint second)
+        private static double XZ(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
@@ -227,7 +227,7 @@ namespace KinectSkeletonTracking
             return angleAMB;
         }
 
-        public static double YZ(Joint cen, Joint first, Joint second)
+        private static double YZ(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
             double maZ = first.Position.Z - cen.Position.Z;
@@ -242,7 +242,7 @@ namespace KinectSkeletonTracking
             return angleAMB;
         }
 
-        public static double XYZ(Joint cen, Joint first, Joint second)
+        private static double XYZ(Joint cen, Joint first, Joint second)
         {
             const double PI = 3.1415926535897;
 
@@ -260,7 +260,7 @@ namespace KinectSkeletonTracking
             return angleAMB;
         }
 
-        public static int CopZ(Joint first, Joint second)
+        private static int CopZ(Joint first, Joint second)
         {
             int flag = 0;
             if (first.Position.Z > second.Position.Z)
@@ -271,7 +271,7 @@ namespace KinectSkeletonTracking
             return flag;
         }
 
-        public static double CopY(Joint first, Joint second)
+        private static double CopY(Joint first, Joint second)
         {
             int flag = 0;
             if (first.Position.Z > second.Position.Z)
