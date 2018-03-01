@@ -101,6 +101,16 @@ namespace KinectSkeletonTracking
         byte[] RzElbowL = new byte[4] { 0, 8, 0, 0 };
         byte[] RzSpineMYow = new byte[4] { 0, 10, 0, 0 };
         byte[] RzSpineMPitch = new byte[4] { 0, 11, 0, 0 };
+        byte[] RzFootR = new byte[4] { 5, 0, 0, 0 };
+        byte[] RzAnkleR = new byte[4] { 5, 1, 0, 0 };
+        byte[] RzKneeR = new byte[4] { 5, 2, 0, 0 };
+        byte[] RzHipRPitch = new byte[4] { 5, 4, 0, 0 };
+        byte[] RzHipRRoll = new byte[4] { 5, 5, 0, 0 };
+        byte[] RzHipLRoll = new byte[4] { 5, 6, 0, 0 };
+        byte[] RzHipLPitch = new byte[4] { 5, 7, 0, 0 };
+        byte[] RzKneeL = new byte[4] { 5, 9, 0, 0 };
+        byte[] RzAnkleLPitch = new byte[4] { 5, 10, 0, 0 };
+        byte[] RzFootL = new byte[4] { 5, 11, 0, 0 };
         //KHR
         byte[] KHRElbowR = new byte[4] { 0, 5, 0, 0 };
         byte[] KHRShoulderRRoll = new byte[4] { 0, 6, 0, 0 };
@@ -109,6 +119,17 @@ namespace KinectSkeletonTracking
         byte[] KHRShoulderLRoll = new byte[4] { 0, 10, 0, 0 };
         byte[] KHRElbowL = new byte[4] { 0, 11, 0, 0 };
         byte[] KHRSpineM = new byte[4] { 0, 8, 0, 0 };
+        byte[] KHRFootR = new byte[4] { 0, 0, 0, 0 };
+        byte[] KHRAnkleR = new byte[4] { 0, 1, 0, 0 };
+        byte[] KHRKneeR = new byte[4] { 0, 2, 0, 0 };
+        byte[] KHRHipRPitch = new byte[4] { 0, 3, 0, 0 };
+        byte[] KHRHipRRoll = new byte[4] { 0, 4, 0, 0 };
+        byte[] KHRHipLRoll = new byte[4] { 0, 12, 0, 0 };
+        byte[] KHRHipLPitch = new byte[4] { 0, 13, 0, 0 };
+        byte[] KHRKneeL = new byte[4] { 0, 14, 0, 0 };
+        byte[] KHRAnkleLPitch = new byte[4] { 0, 15, 0, 0 };
+        byte[] KHRFootL = new byte[4] { 0, 16, 0, 0 };
+        //関数角度
         int ElbowR = 163,ShoulderRRoll = 125, ShoulderRPitch = 162, ShoulderLRoll = 168, ShoulderLPitch = 119,  ElbowL = 168, SpainMPitch = 177,SpainMYow;
         //ロボットの移動が必要な関数
         int Zsflg, Ysflg;
@@ -119,9 +140,10 @@ namespace KinectSkeletonTracking
 
         const double PI = 3.1415926535897;
         BodyFrameReader bodyFrameReader; //
-        Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-        Conection server1 = new Conection(Port1);
-        Conection server2 = new Conection(Port2);
+        Body[] bodies=null; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
+        
+        //Conection server1 = new Conection(Port1);
+        //Conection server2 = new Conection(Port2);
         public MainWindow()
         {
             InitializeComponent();
@@ -172,6 +194,7 @@ namespace KinectSkeletonTracking
         // イベント発生はこのメソッドに通知される？
         void bodyFrameReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
+            
             UpdateBodyFrame(e); // ボディデータの更新をする
             // DrawBodyFrame(); // TODO:GUIに対する描写は後に実装する
             SendRotate();    // 角度を取得して送信する
@@ -347,7 +370,6 @@ namespace KinectSkeletonTracking
                 if (SpainBaseY - body.Joints[JointType.SpineBase].Position.Y < -0.5)
                 {
                     SpainBaseY = body.Joints[JointType.SpineBase].Position.Y;
-                    byte[] stand = new byte[] { 4, 0, 0, 0 };
                     // Debug.WriteLine(BitConverter.ToString(stand));
                     //server1.send("stand");
                 }
@@ -379,7 +401,7 @@ namespace KinectSkeletonTracking
                 ElbowL = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
                 ElbowL = (120 - ElbowL) / 6;
                 ElbowL = ElbowL * 6;
-                SpainMYow = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+                SpainMPitch = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
                 SpainMYow = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
                 SpainMPitch = (SpainMPitch - 225) / 6;
                 SpainMPitch = SpainMPitch * 6;
@@ -397,6 +419,14 @@ namespace KinectSkeletonTracking
                 //server1.send("8:"+ElbowL.ToString());
                 //server1.send("10:"+SpainMYow.ToString());
                 //server1.send("11:"+SpainMPitch.ToString());
+                Debug.WriteLine("1:" + ElbowR.ToString());
+                Debug.WriteLine("3:"+ShoulderRRoll.ToString());
+                Debug.WriteLine("4:"+ShoulderRPitch.ToString());
+                Debug.WriteLine("5:"+ShoulderLPitch.ToString());
+                Debug.WriteLine("6:"+ShoulderLRoll.ToString());
+                Debug.WriteLine("8:"+ElbowL.ToString());
+                Debug.WriteLine("10:"+SpainMYow.ToString());
+                Debug.WriteLine("11:"+SpainMPitch.ToString());
             }
         }
         //ロボゼロのbyte型送信
@@ -521,6 +551,7 @@ namespace KinectSkeletonTracking
                 //server1.sendtbyte(RzElbowL);
                 //server1.sendtbyte(RzSpineMYow);
                 //server1.sendtbyte(RzSpineMPitch);
+                Debug.WriteLine(BitConverter.ToString(RzElbowR));
             }
         }
         //KHRのbyte型送信
@@ -639,6 +670,7 @@ namespace KinectSkeletonTracking
                 //server1.sendtbyte(KHRShoulderLRoll);
                 //server1.sendtbyte(KHRElbowL);
                 //server1.sendtbyte(KHRSpineM);
+                Debug.WriteLine(BitConverter.ToString(KHRElbowR));
             }
         }
         //KHRのstring型送信
@@ -736,6 +768,14 @@ namespace KinectSkeletonTracking
                 //server1.send("10:"+ShoulderLRoll.ToString());
                 //server1.send("11:"+ElbowL.ToString());
                 //server1.send("8:"+SpainMYow.ToString());
+
+                Debug.WriteLine("K5:"+ElbowR.ToString());
+                Debug.WriteLine("K6:"+ShoulderRRoll.ToString());
+                Debug.WriteLine("K7:"+ShoulderRPitch.ToString());
+                Debug.WriteLine("K9:"+ShoulderLPitch.ToString());
+                Debug.WriteLine("K10:"+ShoulderLRoll.ToString());
+                Debug.WriteLine("K11:"+ElbowL.ToString());
+                Debug.WriteLine("K8:"+SpainMYow.ToString());
             }
         }
         private void SendRotate()
@@ -807,14 +847,13 @@ namespace KinectSkeletonTracking
                                 string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
-                                
 
-                                    sendTime = n % 3;
+
+                                sendTime = n % 30;
                                     if (sendTime == 1)
                                     {
-                                    
-                                    //robozeroByte(body);
-                                    //KHRByte(body);
+
+
                                     /*switch (joint.Key)           //KHR対応
                                     {
                                         case JointType.FootRight:
@@ -862,21 +901,15 @@ namespace KinectSkeletonTracking
                                             break;
                                     }*/
 
-                                    
+                                    robozeroString(body);
+                                    //robozeroByte(body);
 
-
+                                    //KHRByte(bodies[1]);
+                                    if (bodies[1] != null)
+                                    {
+                                        KHRString(bodies[1]);
+                                    }
                                    
-
-                                   
-
-                                  
-
-
-                                    
-                         
-
-
-
                                 }
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
