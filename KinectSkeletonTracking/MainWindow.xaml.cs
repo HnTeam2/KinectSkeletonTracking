@@ -443,9 +443,9 @@ namespace KinectSkeletonTracking
                     Sm11[3] = j[1];
                 });
                 //同期待ち状態。動作が遅くなる場合は消す
-                var combinedTask = Task.WhenAll(taskSr3, taskSr4, taskEr1, taskSl5, taskSl6, taskEl8, taskSm10,
+              /*  var combinedTask = Task.WhenAll(taskSr3, taskSr4, taskEr1, taskSl5, taskSl6, taskEl8, taskSm10,
                     taskSm11);
-                await combinedTask;
+                await combinedTask;*/
             }
         }
 
