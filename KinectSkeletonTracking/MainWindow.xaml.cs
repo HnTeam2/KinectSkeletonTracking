@@ -51,15 +51,21 @@ namespace KinectSkeletonTracking
        
 
         //-----//接続相手にデータを送信する//-----//
-        public void socket(byte[] sendMsg)
+        public void sendbyte(byte[] sendMsg)
+        {
+            enc = System.Text.Encoding.UTF8;
+            ns.Write(sendMsg, 0, sendMsg.Length);
+            Console.WriteLine(sendMsg);
+        }
+        public void send(string sendMsg)
         {
             enc = System.Text.Encoding.UTF8;
             //クライアントに送る文字列を作成してデータを送信する
-            
+
             //文字列をバイト型配列に変換
-            //byte[] sendBytes = enc.GetBytes(sendMsg);
+            byte[] sendBytes = enc.GetBytes(sendMsg);
             //データを送信する
-            ns.Write(sendMsg, 0, sendMsg.Length);
+            ns.Write(sendBytes, 0, sendBytes.Length);
             Console.WriteLine(sendMsg);
         }
 
@@ -83,23 +89,39 @@ namespace KinectSkeletonTracking
     {
         KinectSensor kinect;
         int flag = 0,n=0;
-        byte[] Er1 = new byte[4] { 0, 1, 0, 0 };
-        byte[] Sr3 = new byte[4] { 0, 3, 0, 0 };
-        byte[] Sr4 = new byte[4] { 0, 4, 0, 0 };
-        byte[] Sl5 = new byte[4] { 0, 5, 0, 0 };
-        byte[] Sl6 = new byte[4] { 0, 6, 0, 0 };
-        byte[] El8 = new byte[4] { 0, 8, 0, 0 };
-        byte[] Sm10 = new byte[4] { 0, 10, 0, 0 };
-        byte[] Sm11 = new byte[4] { 0, 11, 0, 0 };
-        int ER1 = 163, ER2 = 130, SR3 = 125, SR4 = 162, SL5 = 168, SL6 = 119, EL7 = 139, EL8 = 168, SM11 = 177,SM10;
-        int cnt = 0,cut=0;
-        float z, y;
-        public const int Port = 55555;
+        //角道格納(バイト型)
+        byte[] angle;
+        
+        //robozero
+        byte[] RzElbowR = new byte[4] { 0, 1, 0, 0 };
+        byte[] RzShoulderRRoll = new byte[4] { 0, 3, 0, 0 };
+        byte[] RzShoulderRPitch = new byte[4] { 0, 4, 0, 0 };
+        byte[] RzShoulderLPitch = new byte[4] { 0, 5, 0, 0 };
+        byte[] RzShoulderLRoll = new byte[4] { 0, 6, 0, 0 };
+        byte[] RzElbowL = new byte[4] { 0, 8, 0, 0 };
+        byte[] RzSpineMYow = new byte[4] { 0, 10, 0, 0 };
+        byte[] RzSpineMPitch = new byte[4] { 0, 11, 0, 0 };
+        //KHR
+        byte[] KHRElbowR = new byte[4] { 0, 5, 0, 0 };
+        byte[] KHRShoulderRRoll = new byte[4] { 0, 6, 0, 0 };
+        byte[] KHRShoulderRPitch = new byte[4] { 0, 7, 0, 0 };
+        byte[] KHRShoulderLPitch = new byte[4] { 0, 9, 0, 0 };
+        byte[] KHRShoulderLRoll = new byte[4] { 0, 10, 0, 0 };
+        byte[] KHRElbowL = new byte[4] { 0, 11, 0, 0 };
+        byte[] KHRSpineM = new byte[4] { 0, 8, 0, 0 };
+        int ElbowR = 163,ShoulderRRoll = 125, ShoulderRPitch = 162, ShoulderLRoll = 168, ShoulderLPitch = 119,  ElbowL = 168, SpainMPitch = 177,SpainMYow;
+        //ロボットの移動が必要な関数
+        int Zsflg, Ysflg;
+        float SpainBaseZ, SpainBaseY;
+        //ポート番号
+        public const int Port1 = 55555;
         public const int Port2 = 9999;
+
+        const double PI = 3.1415926535897;
         BodyFrameReader bodyFrameReader; //
         Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
-      //     Conection server1 = new Conection(Port);
-        //Conection server2 = new Conection(Port2);
+        Conection server1 = new Conection(Port1);
+        Conection server2 = new Conection(Port2);
         public MainWindow()
         {
             InitializeComponent();
@@ -199,11 +221,10 @@ namespace KinectSkeletonTracking
 
             CanvasBody.Children.Add(ellipse);
         }
-
+        //XY XZ YZ XYZ 面の角道計算
         public static double XY(Joint cen , Joint first, Joint second)
         {
-            const double PI = 3.1415926535897;
-
+            
             double maX = first.Position.X - cen.Position.X;
             double maY = first.Position.Y - cen.Position.Y;
             double mbX = second.Position.X - cen.Position.X;
@@ -218,7 +239,7 @@ namespace KinectSkeletonTracking
         }
         public static double XZ(Joint cen, Joint first, Joint second)
         {
-            const double PI = 3.1415926535897;
+         
 
             double maZ = first.Position.Z - cen.Position.Z;
             double maX = first.Position.X - cen.Position.X;
@@ -234,7 +255,7 @@ namespace KinectSkeletonTracking
         }
         public static double YZ(Joint cen, Joint first, Joint second)
         {
-            const double PI = 3.1415926535897;
+            
 
             double maZ = first.Position.Z - cen.Position.Z;
             double maY = first.Position.Y - cen.Position.Y;
@@ -248,24 +269,9 @@ namespace KinectSkeletonTracking
 
             return angleAMB;
         }
-        public static int CopZ(Joint first, Joint second)
-        {
-            int flag = 0;
-            if (first.Position.Z > second.Position.Z) { flag = 1; }
-            return flag;
-
-        }
-
-        public static double CopY(Joint first, Joint second)
-        {
-            int flag = 0;
-            if (first.Position.Z > second.Position.Z) { flag = 1; }
-            return flag;
-
-        }
         public static double XYZ(Joint cen , Joint first, Joint second)
         {
-            const double PI = 3.1415926535897;
+            
 
             double maX = first.Position.X - cen.Position.X;
             double maY = first.Position.Y - cen.Position.Y;
@@ -281,7 +287,24 @@ namespace KinectSkeletonTracking
 
             return angleAMB;
         }
-        private void robozero(Body body)
+        //Z軸の比べで前進後退判定
+        public static int CopZ(Joint first, Joint second)
+        {
+            int flag = 0;
+            if (first.Position.Z > second.Position.Z) { flag = 1; }
+            return flag;
+
+        }
+        //Y軸の比べでしゃがみ立つ判定
+        public static double CopY(Joint first, Joint second)
+        {
+            int flag = 0;
+            if (first.Position.Z > second.Position.Z) { flag = 1; }
+            return flag;
+
+        }
+       //ロボゼロのstring型送信
+        private void robozeroString(Body body)
         {
             if (cnt == 0)
             {
@@ -293,16 +316,16 @@ namespace KinectSkeletonTracking
                 if (z - body.Joints[JointType.SpineBase].Position.Z > 0.5)
                 {
                     z = body.Joints[JointType.SpineBase].Position.Z;
-                    byte[] sya = new byte[] { 1, 0, 0, 0 };
-                    Debug.WriteLine(BitConverter.ToString(sya));
-                    //server1.socket(sya);
+                    byte[] go = new byte[] { 1, 0, 0, 0 };
+                    //Debug.WriteLine(BitConverter.ToString(go));
+                    //server1.socket(go);
                 }
                 if (z - body.Joints[JointType.SpineBase].Position.Z < -0.5)
                 {
                     z = body.Joints[JointType.SpineBase].Position.Z;
-                    byte[] ta = new byte[] { 2, 0, 0, 0 };
-                    //server1.socket(ta);
-                    Debug.WriteLine(BitConverter.ToString(ta));
+                    byte[] back = new byte[] { 2, 0, 0, 0 };
+                    //server1.socket(back);
+                    // Debug.WriteLine(BitConverter.ToString(back));
                 }
             }
             if (cut == 0)
@@ -314,20 +337,20 @@ namespace KinectSkeletonTracking
             {
                 if (y - body.Joints[JointType.SpineBase].Position.Y > 0.5)
                 {
-                    z = body.Joints[JointType.SpineBase].Position.Y;
-                    byte[] go = new byte[] { 3, 0, 0, 0 };
-                    Debug.WriteLine(BitConverter.ToString(go));
-                    //server1.socket(go);
+                    y = body.Joints[JointType.SpineBase].Position.Y;
+                    byte[] sya = new byte[] { 3, 0, 0, 0 };
+                    //Debug.WriteLine(BitConverter.ToString(sya));
+                    //server1.socket(sya);
                 }
-                if (z - body.Joints[JointType.SpineBase].Position.Y < -0.5)
+                if (y - body.Joints[JointType.SpineBase].Position.Y < -0.5)
                 {
-                    z = body.Joints[JointType.SpineBase].Position.Y;
-                    byte[] back = new byte[] { 4, 0, 0, 0 };
-                    Debug.WriteLine(BitConverter.ToString(back));
-                    //server1.socket(back);
+                    y = body.Joints[JointType.SpineBase].Position.Y;
+                    byte[] ta = new byte[] { 4, 0, 0, 0 };
+                    // Debug.WriteLine(BitConverter.ToString(ta));
+                    //server1.socket(ta);
                 }
             }
-            if (z - body.Joints[JointType.SpineBase].Position.Z < 20 && z - body.Joints[JointType.SpineBase].Position.Z > -20)
+            if (z - body.Joints[JointType.SpineBase].Position.Z < 0.5 && z - body.Joints[JointType.SpineBase].Position.Z > -0.5)
             {
                 SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineMid], body.Joints[JointType.ElbowRight]);
                 SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
@@ -336,29 +359,26 @@ namespace KinectSkeletonTracking
                 SR3 = SR3 * 6;
                 SR4 = SR4 * 6;
                 if (SR4 > 0) SR4 = SR4 * 2;
-                Int16 sr3 = (Int16)SR3;
-                Int16 sr4 = (Int16)SR4;
+                 
                 ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
                 //ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
                 ER1 = (ER1 - 120) / 6;
                 ER1 = ER1 * 6;
                 // ER2 = ER2 - 130;
-                Int16 er1 = (Int16)ER1;
-                // string er2 = ER2.ToString();
+                 
                 SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
                 SL5 = (SL5 - 173) / 6;
                 SL5 = SL5 * 6;
                 if (SL5 > 0) SL5 = SL5 * 2;
-                Int16 sl5 = (Int16)SL5;
+                 
                 SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
                 SL6 = 160 - SL6;
                 SL6 = SL6 / 6;
-                SL6 = SL6 * 6;
-                Int16 sl6 = (Int16)SL6;
+               
                 EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
                 EL8 = (120 - EL8) / 6;
                 EL8 = EL8 * 6;
-                Int16 el8 = (Int16)EL8;
+                 
                 SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
                 SM10 = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
                 SM11 = (SM11 - 225) / 6;
@@ -367,35 +387,246 @@ namespace KinectSkeletonTracking
                 SM10 = (SM10 - 169) / 6;
                 SM10 = SM10 * 6;
                 if (flag == 0) { SM10 = 0 - SM10; }
-                Int16 sm11 = (Int16)SM11;
-                Int16 sm10 = (Int16)SM10;
+                sm11 = SM11.ToString();
+                sm10 = SM10.ToString();
+                sr3 = SR3.ToString();
+                sr4 =SR4.ToString();
+                el8 = EL8.ToString();
+                er1 = ER1.ToString();
+                sl5 = SL5.ToString();
+                sl6 = SL6.ToString();
+            }
+        }
+        //ロボゼロのbyte型送信
+        private void robozeroByte(Body body)
+        {
+            if (Zsflg == 0)
+            {
+                SpainBaseZ = body.Joints[JointType.SpineBase].Position.Z;
+                Zsflg++;
+            }
+            else
+            {
+                if (SpainBaseZ - body.Joints[JointType.SpineBase].Position.Z > 0.5)
+                {
+                    SpainBaseZ = body.Joints[JointType.SpineBase].Position.Z;
+                    byte[] go = new byte[] { 1, 0, 0, 0 };
+                    //Debug.WriteLine(BitConverter.ToString(go));
+                    //server1.socket(go);
+                }
+                if (SpainBaseZ - body.Joints[JointType.SpineBase].Position.Z < -0.5)
+                {
+                    SpainBaseZ = body.Joints[JointType.SpineBase].Position.Z;
+                    byte[] back = new byte[] { 2, 0, 0, 0 };
+                    //server1.socket(back);
+                   // Debug.WriteLine(BitConverter.ToString(back));
+                }
+            }
+            if (Ysflg == 0)
+            {
+                SpainBaseY = body.Joints[JointType.SpineBase].Position.Y;
+                Ysflg++;
+            }
+            else
+            {
+                if (SpainBaseY - body.Joints[JointType.SpineBase].Position.Y > 0.5)
+                {
+                    SpainBaseY = body.Joints[JointType.SpineBase].Position.Y;
+                    byte[] squat = new byte[] { 3, 0, 0, 0 };
+                    //Debug.WriteLine(BitConverter.ToString(squat));
+                    //server1.socket(squat);
+                }
+                if (SpainBaseY - body.Joints[JointType.SpineBase].Position.Y < -0.5)
+                {
+                    SpainBaseY = body.Joints[JointType.SpineBase].Position.Y;
+                    byte[] stand = new byte[] { 4, 0, 0, 0 };
+                   // Debug.WriteLine(BitConverter.ToString(stand));
+                    //server1.socket(stand);
+                }
+            }
+            if (SpainBaseZ - body.Joints[JointType.SpineBase].Position.Z < 0.5 && SpainBaseZ - body.Joints[JointType.SpineBase].Position.Z > -0.5)
+            {
+                ShoulderRRoll = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineMid], body.Joints[JointType.ElbowRight]);
+                ShoulderRPitch = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+                ShoulderRRoll = (ShoulderRRoll - 98) / 6;
+                ShoulderRPitch = (ShoulderRPitch - 128) / 6;
+                ShoulderRRoll = ShoulderRRoll * 6;
+                ShoulderRPitch = ShoulderRPitch * 6;
+                if (ShoulderRPitch > 0) ShoulderRPitch = ShoulderRPitch * 2;
+                ElbowR = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+                //ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
+                ElbowR = (ElbowR - 120) / 6;
+                ElbowR = ElbowR * 6;
+                // ER2 = ER2 - 130;
+                Int16 er1 = (Int16)ElbowR;
+                ShoulderLPitch = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                ShoulderLPitch = (ShoulderLPitch - 173) / 6;
+                ShoulderLPitch = ShoulderLPitch * 6;
+                if (ShoulderLPitch > 0) ShoulderLPitch = ShoulderLPitch * 2;
+                Int16 sl5 = (Int16)ShoulderLPitch;
+                ShoulderLRoll = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+                ShoulderLRoll = 160 - ShoulderLRoll;
+                ShoulderLRoll = ShoulderLRoll / 6;
+                ShoulderLRoll = ShoulderLRoll * 6;
+                Int16 sl6 = (Int16)ShoulderLRoll;
+                ElbowL = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
+                ElbowL = (120 - ElbowL) / 6;
+                ElbowL = ElbowL * 6;
+                Int16 el8 = (Int16)ElbowL;
+                SpainMYow = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+                SpainMYow = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
+                SpainMPitch = (SpainMPitch - 225) / 6;
+                SpainMPitch = SpainMPitch * 6;
+                int flag = CopZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ShoulderLeft]);
+                SpainMYow = (SpainMYow - 169) / 6;
+                SpainMYow = SpainMYow * 6;
+                if (flag == 0) { SpainMYow = 0 - SpainMYow; }
+                Int16 sm11 = (Int16)SpainMPitch;
+                Int16 sm10 = (Int16)SpainMPitch;
 
                 //バイト型変換
-                byte[] c = BitConverter.GetBytes(er1);
-                Er1[2] = c[0];
-                Er1[3] = c[1];
-                byte[] d = BitConverter.GetBytes(sr3);
-                Sr3[2] = d[0];
-                Sr3[3] = d[1];
-                byte[] e = BitConverter.GetBytes(sr4);
-                Sr4[2] = e[0];
-                Sr4[3] = e[1];
-                byte[] f = BitConverter.GetBytes(sl5);
-                Sl5[2] = f[0];
-                Sl5[3] = f[1];
-                byte[] g = BitConverter.GetBytes(sl6);
-                Sl6[2] = g[0];
-                Sl6[3] = g[1];
-                byte[] h = BitConverter.GetBytes(el8);
-                El8[2] = h[0];
-                El8[3] = h[1];
-                byte[] i = BitConverter.GetBytes(sm10);
-                Sm10[2] = i[0];
-                Sm10[3] = i[1];
-                byte[] j = BitConverter.GetBytes(sm11);
-                Sm11[2] = j[0];
-                Sm11[3] = j[1];
+                angle = BitConverter.GetBytes((Int16)ElbowR);
+                RzElbowR[2] = angle[0];
+                RzElbowR[3] = angle[1];
+                angle = BitConverter.GetBytes((Int16)ShoulderRRoll);
+                RzShoulderRRoll[2] = angle[0];
+                RzShoulderRRoll[3] = angle[1];
+                angle = BitConverter.GetBytes((Int16)ShoulderRPitch);
+                RzShoulderRPitch[2] = angle[0];
+                RzShoulderRPitch[3] = angle[1];
+                angle = BitConverter.GetBytes(sl5);
+                RzShoulderLPitch[2] = angle[0];
+                RzShoulderLPitch[3] = angle[1];
+                angle = BitConverter.GetBytes(sl6);
+                RzShoulderLRoll[2] = angle[0];
+                RzShoulderLRoll[3] = angle[1];
+                angle = BitConverter.GetBytes(el8);
+                RzElbowL[2] = angle[0];
+                RzElbowL[3] = angle[1];
+                angle = BitConverter.GetBytes(sm10);
+                RzSpineMYow[2] = angle[0];
+                RzSpineMYow[3] = angle[1];
+                angle = BitConverter.GetBytes(sm11);
+                RzSpineMPitch[2] = angle[0];
+                RzSpineMPitch[3] = angle[1];
+
             }
+        }
+        //KHRのbyte型送信
+        private void KHRByte(Body body)
+        {
+            SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineMid], body.Joints[JointType.ElbowRight]);
+            SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+            SR3 = (SR3 - 133) / 6;
+            SR4 = (SR4 - 128) / 6;
+            SR3 = SR3 * 6;
+            SR4 = SR4 * 6;
+            if (SR4 > 0) SR4 = SR4 * 2;
+            Int16 sr3 = (Int16)SR3;
+            Int16 sr4 = (Int16)SR4;
+            ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+            //ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
+            ER1 = (ER1 - 120) / 6;
+            ER1 = ER1 * 6;
+            // ER2 = ER2 - 130;
+            Int16 er1 = (Int16)ER1;
+            SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+            SL5 = (SL5 - 173) / 6;
+            SL5 = SL5 * 6;
+            if (SL5 > 0) SL5 = SL5 * 2;
+            Int16 sl5 = (Int16)SL5;
+            SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+            SL6 = 205 - SL6;
+            SL6 = SL6 / 6;
+            SL6 = SL6 * 6;
+            Int16 sl6 = (Int16)SL6;
+            EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
+            EL8 = (120 - EL8) / 6;
+            EL8 = EL8 * 6;
+            Int16 el8 = (Int16)EL8;
+            SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+            SM10 = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
+            SM11 = (SM11 - 225) / 6;
+            SM11 = SM11 * 6;
+            int flag = CopZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ShoulderLeft]);
+            SM10 = (SM10 - 169) / 6;
+            SM10 = SM10 * 6;
+            if (flag == 0) { SM10 = 0 - SM10; }
+            Int16 sm11 = (Int16)SM11;
+            Int16 sm10 = (Int16)SM10;
+
+            //バイト型変換
+           
+            angle = BitConverter.GetBytes(er1);
+            KHRElbowR[2] = angle[0];
+            KHRElbowR[3] = angle[1];
+            angle = BitConverter.GetBytes(sr3);
+            KHRShoulderRRoll[2] = angle[0];
+            KHRShoulderRRoll[3] = angle[1];
+            angle = BitConverter.GetBytes(sr4);
+            KHRShoulderRPitch[2] = angle[0];
+            KHRShoulderRPitch[3] = angle[1];
+            angle = BitConverter.GetBytes(sl5);
+            KHRShoulderLPitch[2] = angle[0];
+            KHRShoulderLPitch[3] = angle[1];
+            angle = BitConverter.GetBytes(sl6);
+            KHRShoulderLRoll[2] = angle[0];
+            KHRShoulderLRoll[3] = angle[1];
+            angle = BitConverter.GetBytes(el8);
+            KHRElbowL[2] = angle[0];
+            KHRElbowL[3] = angle[1];
+            angle = BitConverter.GetBytes(sm10);
+            KHRSpineM[2] = angle[0];
+            KHRSpineM[3] = angle[1];
+        }
+        //KHRのstring型送信
+        private void KHRString(Body body)
+        {
+            SR3 = (int)XYZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineMid], body.Joints[JointType.ElbowRight]);
+            SR4 = (int)YZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowRight]);
+            SR3 = (SR3 - 133) / 6;
+            SR4 = (SR4 - 128) / 6;
+            SR3 = SR3 * 6;
+            SR4 = SR4 * 6;
+            if (SR4 > 0) SR4 = SR4 * 2;
+          
+            ER1 = (int)XYZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandRight], body.Joints[JointType.ShoulderRight]);
+            //ER2 = (int)XZ(body.Joints[JointType.ElbowRight], body.Joints[JointType.HandTipRight], body.Joints[JointType.ShoulderRight]);
+            ER1 = (ER1 - 120) / 6;
+            ER1 = ER1 * 6;
+            // ER2 = ER2 - 130;
+            
+            SL5 = (int)YZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+            SL5 = (SL5 - 173) / 6;
+            SL5 = SL5 * 6;
+            if (SL5 > 0) SL5 = SL5 * 2;
+         ;
+            SL6 = (int)XYZ(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.SpineShoulder], body.Joints[JointType.ElbowLeft]);
+            SL6 = 205 - SL6;
+            SL6 = SL6 / 6;
+            SL6 = SL6 * 6;
+          
+            EL8 = (int)XYZ(body.Joints[JointType.ElbowLeft], body.Joints[JointType.HandLeft], body.Joints[JointType.ShoulderLeft]);
+            EL8 = (120 - EL8) / 6;
+            EL8 = EL8 * 6;
+            
+            SM11 = (int)YZ(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase], body.Joints[JointType.SpineShoulder]);
+            SM10 = (int)XZ(body.Joints[JointType.SpineMid], body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ShoulderRight]);
+            SM11 = (SM11 - 225) / 6;
+            SM11 = SM11 * 6;
+            int flag = CopZ(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ShoulderLeft]);
+            SM10 = (SM10 - 169) / 6;
+            SM10 = SM10 * 6;
+            if (flag == 0) { SM10 = 0 - SM10; }
+            
+            
+            sm10 = SM10.ToString();
+            sr3 = SR3.ToString();
+            sr4 = SR4.ToString();
+            el8 = EL8.ToString();
+            er1 = ER1.ToString();
+            sl5 = SL5.ToString();
+            sl6 = SL6.ToString();
         }
         private void SendRotate()
         {
@@ -466,86 +697,119 @@ namespace KinectSkeletonTracking
                                 string RollRotate = R.ToString();
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
-                                robozero(body);
-                             
+                                //robozeroByte(body);
+                                //KHRByte(body);
 
                                     flag = n % 3;
                                     if (flag == 1)
                                     {
-                                        /*switch (joint.Key)           //KHR対応
-                                        {
-                                            case JointType.FootRight:
-                                                server2.socket("0:" + RollRotate);
-                                                break;
-                                            case JointType.AnkleRight:
-                                                server2.socket("1:" + PitchRotate);
-                                                break;
-                                            case JointType.KneeRight:
-                                                server2.socket("2:" + PitchRotate);
-                                                break;
-                                            case JointType.HipRight:
-                                                server2.socket("3:" + PitchRotate);
-                                                server2.socket("4:" + RollRotate);
-                                                break;
-                                            case JointType.ElbowRight:
-                                                server2.socket("5:" + PitchRotate);
-                                                break;
-                                            case JointType.ShoulderRight:
-                                                server2.socket("6:" + RollRotate);
-                                                server2.socket("7:" + PitchRotate);
-                                                break;
-                                            case JointType.SpineMid:
-                                                server2.socket("8:" + YowRotate);
-                                                break;
-                                            case JointType.ShoulderLeft:
-                                                server2.socket("9:" + PitchRotate);
-                                                server2.socket("10:" + RollRotate);
-                                                break;
-                                            case JointType.ElbowLeft:
-                                                server.socket("11;" + PitchRotate);
-                                                break;
-                                            case JointType.HipLeft:
-                                                server2.socket("12:" + RollRotate);
-                                                server2.socket("13:" + PitchRotate);
-                                                break;
-                                            case JointType.KneeLeft:
-                                                server2.socket("14:" + PitchRotate);
-                                                break;
-                                            case JointType.AnkleLeft:
-                                                server2.socket("15:" + PitchRotate);
-                                                break;
-                                            case JointType.FootLeft:
-                                                server2.socket("16:" + RollRotate);
-                                                break;
-                                        }*/
+                                    /*switch (joint.Key)           //KHR対応
+                                    {
+                                        case JointType.FootRight:
+                                            server2.socket("0:" + RollRotate);
+                                            break;
+                                        case JointType.AnkleRight:
+                                            server2.socket("1:" + PitchRotate);
+                                            break;
+                                        case JointType.KneeRight:
+                                            server2.socket("2:" + PitchRotate);
+                                            break;
+                                        case JointType.HipRight:
+                                            server2.socket("3:" + PitchRotate);
+                                            server2.socket("4:" + RollRotate);
+                                            break;
+                                        case JointType.ElbowRight:
+                                            server2.socket("5:" + PitchRotate);
+                                            break;
+                                        case JointType.ShoulderRight:
+                                            server2.socket("6:" + RollRotate);
+                                            server2.socket("7:" + PitchRotate);
+                                            break;
+                                        case JointType.SpineMid:
+                                            server2.socket("8:" + YowRotate);
+                                            break;
+                                        case JointType.ShoulderLeft:
+                                            server2.socket("9:" + PitchRotate);
+                                            server2.socket("10:" + RollRotate);
+                                            break;
+                                        case JointType.ElbowLeft:
+                                            server.socket("11;" + PitchRotate);
+                                            break;
+                                        case JointType.HipLeft:
+                                            server2.socket("12:" + RollRotate);
+                                            server2.socket("13:" + PitchRotate);
+                                            break;
+                                        case JointType.KneeLeft:
+                                            server2.socket("14:" + PitchRotate);
+                                            break;
+                                        case JointType.AnkleLeft:
+                                            server2.socket("15:" + PitchRotate);
+                                            break;
+                                        case JointType.FootLeft:
+                                            server2.socket("16:" + RollRotate);
+                                            break;
+                                    }*/
 
-                                       
-
-
-                                        //転送
-                                        //server1.socket(Er1);
-                                        // server1.socket(Sr3);
-                                        //server1.socket(Sr4);
-                                        //server1.socket(Sl5);
-                                        //server1.socket(Sl6);
-                                        //server1.socket(El8);
-                                        //server1.socket(Sm10);
-                                        //server1.socket(Sm11);
+                                    //ロボゼロ転送<string>
+                                    //server1.send("1:"+er1);
+                                    // server1.send("3:"+sr3);
+                                    //server1.send("4:"+sr4);
+                                    //server1.send("5:"+sl5);
+                                    //server1.send("6:"+sl6);
+                                    //server1.send("8:"+el8);
+                                    //server1.send("10:"+sm10);
+                                    //server1.send("11:"+sm11);
 
 
-                                     //   Debug.WriteLine("1"+BitConverter.ToString(Er1));
-                                  //  Debug.WriteLine("3" + BitConverter.ToString(Sr3));
-                                   // Debug.WriteLine("4" + BitConverter.ToString(Sr4));
-                                   // Debug.WriteLine("5" + BitConverter.ToString(Sl5));
-                                   // Debug.WriteLine("6" + BitConverter.ToString(Sl6));
-                                   // Debug.WriteLine("8" + BitConverter.ToString(El8));
-                                   // Debug.WriteLine("10" + BitConverter.ToString(Sm10));
-                                   // Debug.WriteLine("11" + BitConverter.ToString(Sm11));
-                                    
+                                    //ロボゼロ転送
+                                    //server1.sendtbyte(Er1);
+                                    // server1.sendtbyte(Sr3);
+                                    //server1.sendtbyte(Sr4);
+                                    //server1.sendtbyte(Sl5);
+                                    //server1.sendtbyte(Sl6);
+                                    //server1.sendtbyte(El8);
+                                    //server1.sendtbyte(Sm10);
+                                    //server1.sendtbyte(Sm11);
+
+                                    //KHR転送<string>
+                                    //server1.send("5:"+er1);
+                                    // server1.send("6:"+sr3);
+                                    //server1.send("7:"+sr4);
+                                    //server1.send("9:"+sl5);
+                                    //server1.send("10:"+sl6);
+                                    //server1.send("11:"+el8);
+                                    //server1.send("8:"+sm10);
+
+
+                                    //KHR転送
+                                    //server1.sendtbyte(ElbowR);
+                                    //server1.sendtbyte(ShoulderR6);
+                                    //server1.sendtbyte(ShoulderR7);
+                                    //server1.sendtbyte(ShoulderL9);
+                                    //server1.sendtbyte(ShoulderL10);
+                                    //server1.sendtbyte(ElbowL);
+                                    //server1.sendtbyte(SpineM);
+
+
+                                    Debug.WriteLine("1:"+BitConverter.ToString(ElbowR));
+                                    Debug.WriteLine("2:" + BitConverter.ToString(ShoulderR6));
+                                    Debug.WriteLine("3:" + BitConverter.ToString(ShoulderR7));
+                                    Debug.WriteLine("4:" + BitConverter.ToString(ShoulderL9));
+                                    Debug.WriteLine("5:" + BitConverter.ToString(ShoulderL10));
+                                    Debug.WriteLine("6:" + BitConverter.ToString(ElbowL));
+                                    Debug.WriteLine("7:" + BitConverter.ToString(SpineM));
+                                    //  Debug.WriteLine("3:" + BitConverter.ToString(Sr3));
+                                    // Debug.WriteLine("4:" + BitConverter.ToString(Sr4));
+                                    // Debug.WriteLine("5:" + BitConverter.ToString(Sl5));
+                                    // Debug.WriteLine("6:" + BitConverter.ToString(Sl6));
+                                    // Debug.WriteLine("8:" + BitConverter.ToString(El8));
+                                    // Debug.WriteLine("10:" + BitConverter.ToString(Sm10));
+                                    // Debug.WriteLine("11:" + BitConverter.ToString(Sm11));
+
                                     //Debug.WriteLine("5:" + sl5);
 
 
-                                
+
                                 }
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
