@@ -96,12 +96,24 @@ namespace KinectSkeletonTracking
                      body.Joints[SpineMid],
                      body.Joints[ElbowRight]);
                 rotateShoulderRightR -= 98;
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateShoulderRightR<0)
+                {
+                    RzShoulderRRoll[2] = 1;
+                    rotateShoulderRightR = 0 - rotateShoulderRightR;
+                }
+                else
+                {
+                    RzShoulderRRoll[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateShoulderRightR);
-                RzShoulderRRoll[2] = splitRotate[0];
-                RzShoulderRRoll[3] = splitRotate[1];
+                
+                
+                RzShoulderRRoll[3] = splitRotate[0];
+                
                 if (rotateShoulderRightR > -200 && rotateShoulderRightR < 200)
                 {
-                    //server.sendBytes(RzShoulderRRoll);
+                    server.sendBytes(RzShoulderRRoll);
                     //Debug.WriteLine("R1"+rotateShoulderRightR);
                 }
 
@@ -111,20 +123,38 @@ namespace KinectSkeletonTracking
                     body.Joints[ElbowRight]);
                 rotateShoulderRightP -= 128;
                 if (rotateShoulderRightP > 0) rotateShoulderRightP *= 2;
+                //値がマイナス、プラスを判断し値を絶対値求める 
+                if (rotateShoulderRightP < 0)
+                {
+                    RzShoulderRPitch[2] = 1;
+                    rotateShoulderRightP = 0 - rotateShoulderRightP;
+                }
+                else
+                {
+                    RzShoulderRPitch[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateShoulderRightP);
-                RzShoulderRPitch[2] = splitRotate[0];
-                RzShoulderRPitch[3] = splitRotate[1];
+                RzShoulderRPitch[3] = splitRotate[0];
                 if (rotateShoulderRightP > -200 && rotateShoulderRightP < 200)
                 {
-                    //server.sendBytes(RzShoulderRPitch);
+                    server.sendBytes(RzShoulderRPitch);
                     //Debug.WriteLine("R2" + rotateShoulderRightP);
                 }
                 var rotateElbowRight = (int)CalcXYZ(body.Joints[ElbowRight], body.Joints[HandRight],
                 body.Joints[ShoulderRight]);
                 rotateElbowRight -= 120;
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateElbowRight < 0)
+                {
+                    RzElbowR[2] = 1;
+                    rotateElbowRight = 0 - rotateElbowRight;
+                }
+                else
+                {
+                    RzElbowR[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateElbowRight);
-                RzElbowR[2] = splitRotate[0];
-                RzElbowR[3] = splitRotate[1];
+                RzElbowR[3] = splitRotate[0];
                 if (rotateElbowRight > -200 && rotateElbowRight < 200)
                 {
                     //server.sendBytes(RzElbowR);
@@ -135,9 +165,19 @@ namespace KinectSkeletonTracking
                     body.Joints[ElbowLeft]);
                 rotateShoulderLightP -= 173;
                 if (rotateShoulderLightP > 0) rotateShoulderLightP = rotateShoulderLightP * 2;
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateShoulderLightP < 0)
+                {
+                    RzShoulderLPitch[2] = 1;
+                    rotateShoulderLightP = 0 - rotateShoulderLightP;
+                }
+                else
+                {
+                    RzShoulderLPitch[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateShoulderLightP);
-                RzShoulderLPitch[2] = splitRotate[0];
-                RzShoulderLPitch[3] = splitRotate[1];
+                
+                RzShoulderLPitch[3] = splitRotate[0];
                 if (rotateShoulderLightP > -200 && rotateShoulderLightP < 200)
                 {
                     //server.sendBytes(RzShoulderLPitch);
@@ -147,20 +187,38 @@ namespace KinectSkeletonTracking
                 body.Joints[SpineShoulder],
                 body.Joints[ElbowLeft]);
                 rotateShoulderLightR -= 160;
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateShoulderLightR < 0)
+                {
+                    RzShoulderLRoll[2] = 1;
+                    rotateShoulderLightR = 0 - rotateShoulderLightR;
+                }
+                else
+                {
+                    RzShoulderLRoll[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateShoulderLightR);
-                RzShoulderLRoll[2] = splitRotate[0];
-                RzShoulderLRoll[3] = splitRotate[1];
+                RzShoulderLRoll[3] = splitRotate[0];
                 if (rotateShoulderLightR > -200 && rotateShoulderLightR < 200)
                 {
-                    //server.sendBytes(RzShoulderLPitch);
+                    server.sendBytes(RzShoulderLPitch);
                     //Debug.WriteLine("R5" + rotateShoulderLightR);
                 }
                 var rotateElbowLight = (int)CalcXYZ(body.Joints[ElbowLeft], body.Joints[HandLeft],
                 body.Joints[ShoulderLeft]);
                 rotateElbowLight -= 120;
-                splitRotate = BitConverter.GetBytes((Int16)rotateElbowLight);
-                RzElbowL[2] = splitRotate[0];
-                RzElbowL[3] = splitRotate[1];
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateElbowLight < 0)
+                {
+                    RzElbowL[2] = 1;
+                    rotateElbowLight = 0 - rotateElbowLight;
+                }
+                else
+                {
+                    RzElbowL[2] = 0;
+                }
+                splitRotate = BitConverter.GetBytes((Int16)rotateElbowLight); RzElbowL[2] = splitRotate[0];
+                RzElbowL[3] = splitRotate[0];
                 if (rotateElbowLight > -200 && rotateElbowLight < 200)
                 {
                     //server.sendBytes(RzElbowL);
@@ -169,12 +227,21 @@ namespace KinectSkeletonTracking
                 var rotateSpainMidP = (int)CalcXz(body.Joints[SpineMid], body.Joints[ShoulderLeft],
                 body.Joints[ShoulderRight]);
                 rotateSpainMidP -= 225;
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateSpainMidP < 0)
+                {
+                    RzSpineMPitch[2] = 1;
+                    rotateSpainMidP = 0 - rotateSpainMidP;
+                }
+                else
+                {
+                    RzSpineMPitch[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateSpainMidP);
-                RzSpineMPitch[2] = splitRotate[0];
-                RzSpineMPitch[3] = splitRotate[1];
+                RzSpineMPitch[3] = splitRotate[0];
                 if (rotateSpainMidP > -200 && rotateSpainMidP < 200)
                 {
-                    //server.sendBytes(RzSpineMPitch);
+                    server.sendBytes(RzSpineMPitch);
                     // Debug.WriteLine("R7" + rotateSpainMidP);
                 }
                 var rotateSpainMidY = (int)CalcYZ(body.Joints[SpineMid], body.Joints[SpineBase],
@@ -184,12 +251,21 @@ namespace KinectSkeletonTracking
                 {
                     rotateSpainMidY = 0 - rotateSpainMidY;
                 }
+                //値がマイナス、プラスを判断し値を絶対値求める
+                if (rotateSpainMidY < 0)
+                {
+                    RzSpineMYow[2] = 1;
+                    rotateSpainMidY = 0 - rotateSpainMidY;
+                }
+                else
+                {
+                    RzSpineMYow[2] = 0;
+                }
                 splitRotate = BitConverter.GetBytes((Int16)rotateSpainMidY);
-                RzSpineMYow[2] = splitRotate[0];
-                RzSpineMYow[3] = splitRotate[1];
+                RzSpineMYow[3] = splitRotate[0];
                 if (rotateSpainMidY > -200 && rotateSpainMidY < 200)
                 {
-                    // server.sendBytes(RzSpineMYow);
+                     server.sendBytes(RzSpineMYow);
                     //Debug.WriteLine("R8" + rotateSpainMidY);
                 }
             }
