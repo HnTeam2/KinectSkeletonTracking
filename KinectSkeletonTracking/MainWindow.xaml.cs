@@ -87,25 +87,24 @@ namespace KinectSkeletonTracking
 
         //ポート番号
         public const int Port1 = 55555;
-        public const int Port2 = 9999;
+        public const int Port2 = 66666;
         Connection server1;
         Connection server2;
 
         private KHR3HV khr3Hv;
         private RoboZero roboZero;
-
         BodyFrameReader bodyFrameReader; //
-        Body[] bodies; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
+        Body[] bodies=null; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
 
         public MainWindow()
         {
             InitializeComponent();
 
             server1 = new Connection(Port1);
-            server2 = new Connection(Port2);
+            //server2 = new Connection(Port2);
 
             khr3Hv = new KHR3HV(server1);
-            roboZero = new RoboZero(server2);
+            //roboZero = new RoboZero(server2);
         }
 
         // Windowが表示されたときコールされる
@@ -207,6 +206,16 @@ namespace KinectSkeletonTracking
             // 追跡しているBodyのみループする
             foreach (var body in bodies.Where(b => b.IsTracked))
             {
+                if (sendTime % 3 == 1)
+                {
+                    khr3Hv.KHRByte(bodies[0]);
+                    
+                    if (bodies[1] != null)
+                    {
+                        roboZero.robozeroByte(bodies[1]);
+                    }
+                }
+
                 // Bodyから取得した全関節でループする。
                 foreach (var joint in body.Joints)
                 {
@@ -258,10 +267,7 @@ namespace KinectSkeletonTracking
                                 string PitchRotate = P.ToString();
 
 
-                                if (sendTime % 3 == 1)
-                                {
-                                }
-
+                                
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
 
