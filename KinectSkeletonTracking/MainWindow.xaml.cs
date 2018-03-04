@@ -94,17 +94,17 @@ namespace KinectSkeletonTracking
         private KHR3HV khr3Hv;
         private RoboZero roboZero;
         BodyFrameReader bodyFrameReader; //
-        Body[] bodies=null; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
+        Body[] bodies = null; // Bodyを保持する配列；Kinectは最大6人トラッキングできる
 
         public MainWindow()
         {
             InitializeComponent();
 
             server1 = new Connection(Port1);
-            //server2 = new Connection(Port2);
+            server2 = new Connection(Port2);
 
             khr3Hv = new KHR3HV(server1);
-            //roboZero = new RoboZero(server2);
+            roboZero = new RoboZero(server2);
         }
 
         // Windowが表示されたときコールされる
@@ -209,23 +209,23 @@ namespace KinectSkeletonTracking
                 if (sendTime % 3 == 1)
                 {
                     khr3Hv.KHRByte(bodies[0]);
-                    
+
                     if (bodies[1] != null)
                     {
-                      roboZero.robozeroByte(bodies[1]);
+                        roboZero.robozeroByte(bodies[1]);
                     }
-                
 
-                // Bodyから取得した全関節でループする。
-                foreach (var joint in body.Joints)
-                {
-                    // 追跡可能な状態か？
-                    if (joint.Value.TrackingState == TrackingState.Tracked)
+
+                    // Bodyから取得した全関節でループする。
+                    foreach (var joint in body.Joints)
                     {
-                        DrawEllipse(joint.Value, 10, Brushes.Blue);
+                        // 追跡可能な状態か？
+                        if (joint.Value.TrackingState == TrackingState.Tracked)
+                        {
+                            DrawEllipse(joint.Value, 10, Brushes.Blue);
 
-                        //連想配列
-                        Dictionary<JointType, TextBox> textBox_joint = new Dictionary<JointType, TextBox>
+                            //連想配列
+                            Dictionary<JointType, TextBox> textBox_joint = new Dictionary<JointType, TextBox>
                         {
                             {JointType.ElbowRight, ElbowRight},
                             {JointType.ElbowLeft, ElbowLeft},
@@ -243,47 +243,48 @@ namespace KinectSkeletonTracking
                         };
 
 
-                        //foreachでJointTypeを網羅
-                        foreach (var jointType in textBox_joint.Keys)
-                        {
-                            if (joint.Key == jointType)
+                            //foreachでJointTypeを網羅
+                            foreach (var jointType in textBox_joint.Keys)
                             {
-                                //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
-                                var orientation = body.JointOrientations[joint.Key].Orientation;
+                                if (joint.Key == jointType)
+                                {
+                                    //関節の向きを取得する（Vector4型）。関節の指定にはJoyntType(enum)を使用する。
+                                    var orientation = body.JointOrientations[joint.Key].Orientation;
 
-                                //関節のそれぞれの軸に対応する角度を取得する
+                                    //関節のそれぞれの軸に対応する角度を取得する
 
-                                var pitchRotate = (int) CalcRotate.Pitch(orientation);
-                                var yowRotate = (int) CalcRotate.Yaw(orientation);
-                                var rollRotate = (int) CalcRotate.Roll(orientation);
+                                    var pitchRotate = (int)CalcRotate.Pitch(orientation);
+                                    var yowRotate = (int)CalcRotate.Yaw(orientation);
+                                    var rollRotate = (int)CalcRotate.Roll(orientation);
 
-                                int R = (int) rollRotate;
-                                int Y = (int) yowRotate;
-                                int P = (int) pitchRotate;
+                                    int R = (int)rollRotate;
+                                    int Y = (int)yowRotate;
+                                    int P = (int)pitchRotate;
 
-                                //Textで表示させるためにstring型へ変換
-                                string RollRotate = R.ToString();
-                                string YowRotate = Y.ToString();
-                                string PitchRotate = P.ToString();
+                                    //Textで表示させるためにstring型へ変換
+                                    string RollRotate = R.ToString();
+                                    string YowRotate = Y.ToString();
+                                    string PitchRotate = P.ToString();
 
-                                
-                                
-                                //DictionaryのKeyで値と一致
-                                var Key = jointType;
 
-                                //Keyから値を取得
-                                TextBox textBox_num = textBox_joint[Key];
-                                textBox_num.Text = joint.Key + "R" + " " + RollRotate + " " + "Y" + " " + YowRotate +
-                                                   " " + "P" + " " + PitchRotate;
+
+                                    //DictionaryのKeyで値と一致
+                                    var Key = jointType;
+
+                                    //Keyから値を取得
+                                    TextBox textBox_num = textBox_joint[Key];
+                                    textBox_num.Text = joint.Key + "R" + " " + RollRotate + " " + "Y" + " " + YowRotate +
+                                                       " " + "P" + " " + PitchRotate;
+                                }
+
+                                sendTime++;
                             }
 
-                            sendTime++;
-                        }
 
-
-                        if (joint.Value.TrackingState == TrackingState.Inferred)
-                        {
-                            DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                            if (joint.Value.TrackingState == TrackingState.Inferred)
+                            {
+                                DrawEllipse(joint.Value, 10, Brushes.Yellow);
+                            }
                         }
                     }
                 }

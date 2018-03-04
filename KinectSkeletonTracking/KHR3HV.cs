@@ -160,4 +160,4 @@ namespace KinectSkeletonTracking
             }
         }
     }
-}
+} 
