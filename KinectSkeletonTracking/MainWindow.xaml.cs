@@ -266,7 +266,7 @@ namespace KinectSkeletonTracking
                                 string YowRotate = Y.ToString();
                                 string PitchRotate = P.ToString();
 
-
+                                
                                 
                                 //DictionaryのKeyで値と一致
                                 var Key = jointType;
