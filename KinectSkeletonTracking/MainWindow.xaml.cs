@@ -212,9 +212,9 @@ namespace KinectSkeletonTracking
                     
                     if (bodies[1] != null)
                     {
-                        roboZero.robozeroByte(bodies[1]);
+                      roboZero.robozeroByte(bodies[1]);
                     }
-                }
+                
 
                 // Bodyから取得した全関節でループする。
                 foreach (var joint in body.Joints)
